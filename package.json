@@ -1,0 +1,16 @@
+{
+  "name": "sensors-are-down",
+  "version": "0.0.1",
+  "description": "This is a sweet sweet Alexa game.",
+  "author": "Will Colton",
+  "license": "MIT",
+  "main": "index.js",
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.3.0"
+  },
+  "dependencies": {
+    "alexa-sdk": "^1.0.10"
+  }
+}
