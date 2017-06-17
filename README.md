@@ -41,8 +41,10 @@ Go through the first few steps of setting up an Alexa skill:
 
 * Leave the default settings for Account Linking and Permissions and click Next.
 
-* On the Test page, you can mess around a bit but it does not allow a dialog, so you need to follow steps to [register your Alexa device](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/testing-an-alexa-skill#h2_register) with the developer console.
+* On the Test page, you can mess around a bit but it does not allow a dialog, so you'll need to test on an actual Alexa device.
 
-**YO MIKE: Please insert any missing steps for how to get this working on your actual device**  (yeah i'm on it next)
+* Do not proceed beyond the test page. That is for actually publishing your skill.  You have already gone far enough to test it on your device.
 
-Do not proceed beyond the test page. That is for actually publishing your skill.  You have already gone far enough to test it on your device.
+If your Amazon Developer account uses the same email address as the Amazon account your Alexa device is registered to, and the "Enabled" toggle on the skill's Test page is turned on, the skill should already be available on your device.  You can find it on the [Your Skills list of the Alexa app](http://alexa.amazon.com/spa/index.html#skills/your-skills/).
+
+If you used a different email address for your Amazon Developer account, follow the steps to [register your Alexa device](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/testing-an-alexa-skill#h2_register) with that account.
