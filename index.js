@@ -1,4 +1,4 @@
-import Alexa from 'alexa-sdk';
+const Alexa = require('alexa-sdk');
 
 const appId = 'amzn1.ask.skill.13bc8151-99af-4413-8667-a7f206562bc1';
 

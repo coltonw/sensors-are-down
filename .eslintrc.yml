@@ -1,12 +1,18 @@
-parserOptions:
-  ecmaVersion: 2017
-  sourceType: "module"
+---
+  parserOptions:
+    ecmaVersion: 2015
+    sourceType: "module"
 
-extends:
-  - airbnb-base
+  plugins:
+    - node
 
-env:
-  node: true
+  extends:
+    - eslint:recommended
+    - plugin:node/recommended
+    - airbnb-base
 
-rules:
-  no-console: off
+  env:
+    node: true
+
+  rules:
+    no-console: off
