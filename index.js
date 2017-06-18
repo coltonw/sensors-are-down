@@ -13,8 +13,8 @@ const newSessionHandlers = {
       this.attributes.gamesPlayed = 0;
     }
     this.handler.state = states.STARTMODE;
-    this.emit(':ask', 'Welcome to sensors are down, a space combat game' +
-            '<audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />.' +
+    this.emit(':ask', 'Welcome to sensors are down, a space combat game. ' +
+            '<audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />' +
             `You have played ${this.attributes.gamesPlayed.toString()} times. would you like to play?`,
             'Say yes to start the game or no to quit.');
   },
