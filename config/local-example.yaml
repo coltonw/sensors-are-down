@@ -1,0 +1,4 @@
+# This is the appId for Mike's skill deployment.
+# To other contributors: make a copy of this named local.yaml, and put your own appId here!
+deployment:
+  appId: amzn1.ask.skill.9e83c2d4-be5a-4299-8a1a-aec3b391ba77

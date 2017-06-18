@@ -1,6 +1,5 @@
 const Alexa = require('alexa-sdk');
-
-const appId = 'amzn1.ask.skill.13bc8151-99af-4413-8667-a7f206562bc1';
+const config = require('config');
 
 const states = {
   GUESSMODE: '_GUESSMODE', // User is trying to guess the number.
@@ -13,8 +12,8 @@ const newSessionHandlers = {
       this.attributes.gamesPlayed = 0;
     }
     this.handler.state = states.STARTMODE;
-    this.emit(':ask', 'Welcome to sensors are down, a space combat game' +
-            '<audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />.' +
+    this.emit(':ask', 'Welcome to sensors are down, a space combat game. ' +
+            '<audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />' +
             `You have played ${this.attributes.gamesPlayed.toString()} times. would you like to play?`,
             'Say yes to start the game or no to quit.');
   },
@@ -134,8 +133,8 @@ const guessAttemptHandlers = {
 // eslint-disable-next-line no-unused-vars
 exports.handler = function handler(event, context, callback) {
   const alexa = Alexa.handler(event, context);
-  alexa.appId = appId;
-  alexa.dynamoDBTableName = 'sensorsAreDownUsers';
+  alexa.appId = config.get('deployment.appId');
+  alexa.dynamoDBTableName = config.get('db.tableName');
   alexa.registerHandlers(newSessionHandlers,
     guessModeHandlers,
     startGameHandlers,
