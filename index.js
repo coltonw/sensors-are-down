@@ -4,7 +4,7 @@ const appId = 'amzn1.ask.skill.13bc8151-99af-4413-8667-a7f206562bc1';
 
 const states = {
   GUESSMODE: '_GUESSMODE', // User is trying to guess the number.
-  STARTMODE: '_STARTMODE',  // Prompt the user to start or restart the game.
+  STARTMODE: '_STARTMODE', // Prompt the user to start or restart the game.
 };
 
 const newSessionHandlers = {
