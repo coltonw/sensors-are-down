@@ -1,6 +1,5 @@
 const Alexa = require('alexa-sdk');
-
-const appId = 'amzn1.ask.skill.13bc8151-99af-4413-8667-a7f206562bc1';
+const config = require('config');
 
 const states = {
   GUESSMODE: '_GUESSMODE', // User is trying to guess the number.
@@ -134,8 +133,8 @@ const guessAttemptHandlers = {
 // eslint-disable-next-line no-unused-vars
 exports.handler = function handler(event, context, callback) {
   const alexa = Alexa.handler(event, context);
-  alexa.appId = appId;
-  alexa.dynamoDBTableName = 'sensorsAreDownUsers';
+  alexa.appId = config.get('deployment.appId');
+  alexa.dynamoDBTableName = config.get('db.tableName');
   alexa.registerHandlers(newSessionHandlers,
     guessModeHandlers,
     startGameHandlers,
