@@ -1,0 +1,6 @@
+# This is the appId for Will's skill deployment. It will be used by default.
+# To override this, you can define a config/local.yaml file with a different app ID.
+deployment:
+  appId: amzn1.ask.skill.13bc8151-99af-4413-8667-a7f206562bc1
+db:
+  tableName: sensorsAreDownUsers
