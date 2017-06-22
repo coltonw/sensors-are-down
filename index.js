@@ -1,5 +1,6 @@
 const Alexa = require('alexa-sdk');
 const config = require('config');
+const _ = require('lodash');
 const engine = require('./lib/engine');
 
 const states = {
@@ -45,9 +46,12 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     this.handler.state = states.GUESSMODE;
     const store = engine.init(this.attributes.gameState);
     store.dispatch(engine.startGame());
-    this.attribute.gameState = store.getState();
-    console.log(this.attribute.gameState);
-    const choices = this.attribute.gameState.offenseCardChoices.playerCards.join(' or ');
+    this.attributes.gameState = store.getState();
+    console.log(store.getState());
+    const choiceNames = _.map(
+      _.values(store.getState().game.offenseCardChoices.playerCards),
+      value => value.name);
+    const choices = choiceNames.join(' or ');
     this.emit(':ask', `Great! Would you like to deploy ${choices}?`, 'Try saying a number.');
   },
   'AMAZON.NoIntent': function NoIntent() {
