@@ -47,7 +47,8 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     const store = engine.init(this.attributes.gameState);
     store.dispatch(engine.startGame());
     this.attributes.gameState = store.getState();
-    console.log(store.getState());
+    console.log('Player deck:');
+    console.dir(store.getState().game.playerDeck);
     const choiceNames = _.map(
       _.values(store.getState().game.offenseCardChoices.playerCards),
       value => value.name);

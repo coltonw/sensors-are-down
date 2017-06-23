@@ -43,8 +43,10 @@ cards:
     name: Planetary Bombers
     description: When the planet seems lost, the Planetary Bombers will destroy everything on it
     special: true
+    defense: true
+    planet: true
   tankBattalion:
-    name: Tank Battalioon
+    name: Tank Battalion
     description: The Tank Battalion is boring in its consistency
     strength: 2
     offense: true
