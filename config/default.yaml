@@ -14,8 +14,8 @@ cards:
     # shieldStrength: bonus strength only used when being damaged (defaults to 0)
     # offense: card can be used on offense (defaults to false)
     # defense: card can be used on defense (defaults to false)
-    # space: card can be used in space (defaults to false)
-    # planet: card can be used on planet (defaults to false)
+    # space: card is used in space (defaults to false)
+    # planet: card is used on planet (defaults to false)
     # count: number of times card is can be used before card is removed from deck (defaults to 1)
   relentlessSwarm:
     name: Relentless Swarm
