@@ -7,6 +7,10 @@ provider:
   name: aws
   runtime: nodejs6.10
 
+package:
+  exclude:
+    - audio/**
+
 functions:
   sensorsAreDown:
     handler: index.handler

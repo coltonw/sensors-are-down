@@ -61,3 +61,28 @@ On the Test page of the Amazon Developer Console, you can mess around a bit but 
 If your Amazon Developer account uses the same email address as the Amazon account your Alexa device is registered to, and the "Enabled" toggle on the skill's Test page is turned on, the skill should already be available on your device.  You can find it on the [Your Skills list of the Alexa app](http://alexa.amazon.com/spa/index.html#skills/your-skills/).
 
 If you used a different email address for your Amazon Developer account, follow the steps to [register your Alexa device](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/testing-an-alexa-skill#h2_register) with that account.
+
+Game Flow
+---------
+
+Player perspective:
+```
+Choose attack -> Hear opponent's attack -> Choose defense
+^                                           |
+|                                           v
+|-- If game continues <- Hear result of all combat -> If victory or defeat,
+                                                      hear end of game info
+```
+
+Engine perspective:
+```
+Give player two attack choices
+Player chooses attack action
+Choose opponent's attack (randomly for now)
+Speak opponent's attack to player and give player two defense choices
+Player chooses defense action
+Calculate if victory has occurred -> if victory or defeat, give player end of game info
+Calculate combat results
+Give player important combat results
+^ Back to top ^
+```

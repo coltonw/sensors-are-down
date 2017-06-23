@@ -1,15 +1,18 @@
 const Alexa = require('alexa-sdk');
 const config = require('config');
+const _ = require('lodash');
+const engine = require('./lib/engine');
 
 const states = {
   GUESSMODE: '_GUESSMODE', // User is trying to guess the number.
-  STARTMODE: '_STARTMODE',  // Prompt the user to start or restart the game.
+  STARTMODE: '_STARTMODE', // Prompt the user to start or restart the game.
 };
 
 const newSessionHandlers = {
   NewSession() {
     if (Object.keys(this.attributes).length === 0) {
       this.attributes.gamesPlayed = 0;
+      this.attributes.gameState = null;
     }
     this.handler.state = states.STARTMODE;
     this.emit(':ask', 'Welcome to sensors are down, a space combat game. ' +
@@ -41,7 +44,16 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
   'AMAZON.YesIntent': function YesIntent() {
     this.attributes.guessNumber = Math.floor(Math.random() * 100);
     this.handler.state = states.GUESSMODE;
-    this.emit(':ask', 'Great! Try saying a number to start the game.', 'Try saying a number.');
+    const store = engine.init(this.attributes.gameState);
+    store.dispatch(engine.startGame());
+    this.attributes.gameState = store.getState();
+    console.log('Player deck:');
+    console.dir(store.getState().game.playerDeck);
+    const choiceNames = _.map(
+      _.values(store.getState().game.offenseCardChoices.playerCards),
+      value => value.name);
+    const choices = choiceNames.join(' or ');
+    this.emit(':ask', `Great! Would you like to deploy ${choices}?`, 'Try saying a number.');
   },
   'AMAZON.NoIntent': function NoIntent() {
     console.log('NOINTENT');

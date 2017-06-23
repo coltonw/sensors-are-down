@@ -4,3 +4,61 @@ deployment:
   appId: amzn1.ask.skill.13bc8151-99af-4413-8667-a7f206562bc1
 db:
   tableName: sensorsAreDownUsers
+cards:
+  # cardId:
+    # name: Readable name of card
+    # description: Readable description of the card
+    # special: card has rules in code (defaults to false)
+    # strength: base strength of card (defaults to 0)
+    # damageStrength: bonus strength only used damaging the opponent card (defaults to 0)
+    # shieldStrength: bonus strength only used when being damaged (defaults to 0)
+    # offense: card can be used on offense (defaults to false)
+    # defense: card can be used on defense (defaults to false)
+    # space: card is used in space (defaults to false)
+    # planet: card is used on planet (defaults to false)
+    # count: number of times card is can be used before card is removed from deck (defaults to 1)
+  relentlessSwarm:
+    name: Relentless Swarm
+    description: Relentless Swarm are weak ships but we are stocked with 4 rounds of them
+    strength: 1
+    offense: true
+    defense: true
+    space: true
+    count: 4
+  ionTurrets:
+    name: Ion Turrets
+    description: Ion Turrets are tough. Hopefully they will hold
+    strength: 2
+    shieldStrength: 1
+    defense: true
+    space: true
+  assaultFrigates:
+    Name: Assault Frigates
+    description: Assault Frigates are our strongest ships for space combat
+    strength: 3
+    offense: true
+    defense: true
+    space: true
+  planetaryBombers:
+    name: Planetary Bombers
+    description: When the planet seems lost, the Planetary Bombers will destroy everything on it
+    special: true
+    defense: true
+    planet: true
+  tankBattalion:
+    name: Tank Battalion
+    description: The Tank Battalion is boring in its consistency
+    strength: 2
+    offense: true
+    defense: true
+    planet: true
+    count: 3
+  groundTroops:
+    name: Ground Troops
+    description: Ground Troops are pretty much worthless. But we throw'em down there just to disrupt things.
+    strength: 1
+    damageStrength: 1
+    offense: true
+    defense: true
+    planet: true
+    count: 4
