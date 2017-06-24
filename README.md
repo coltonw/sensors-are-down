@@ -65,24 +65,36 @@ If you used a different email address for your Amazon Developer account, follow 
 Game Flow
 ---------
 
-Player perspective:
+### Player perspective
 ```
 Choose attack -> Hear opponent's attack -> Choose defense
-^                                           |
-|                                           v
-|-- If game continues <- Hear result of all combat -> If victory or defeat,
+^                                           │
+│                                           v
+└── If game continues <- Hear result of all combat -> If victory or defeat,
                                                       hear end of game info
 ```
 
-Engine perspective:
-```
-Give player two attack choices
-Player chooses attack action
-Choose opponent's attack (randomly for now)
-Speak opponent's attack to player and give player two defense choices
-Player chooses defense action
-Calculate if victory has occurred -> if victory or defeat, give player end of game info
-Calculate combat results
-Give player important combat results
-^ Back to top ^
-```
+### Engine perspective
+1. Give player two attack choices. Choices are from the player's deck and have offense === true
+2. Player chooses attack action
+3. Choose opponent's attack (randomly for now)
+4. Speak opponent's attack to player and give player two defense choices. Choices are from the player's deck and have `defense === true` and ship or planet === opponent's attack ship or planet
+5. Player chooses defense action
+6. Calculate if victory has occurred, if victory or defeat, skip to 10
+7. Calculate combat results. See next section.
+8. Give player important combat results
+9. ^ Back to 1 ^
+10. Give player end of game info
+
+### Combat mechanics
+* Attacks go to the planet or to the opponent's ship.
+* Defense goes to the planet or to your own ship.
+* Check each ship and the planets, three "combat zones", to see if victory has occurred
+   * If this is a ship and the defense has 0 cards at the ship, the ship takes one damage. 2 damage and the ship is destroyed and the offensive team wins with a ship victory.
+   * If this is the planet and one side has 0 cards, the other side is now "entrenched". If they were already entrenched, they win with a planet victory.
+   * If a ship victory and a planet victory happen at once, the ship victory takes precedence.  If two ship victories happen at once, whoever has the higher strength on the planet wins. If they have equal strength on the planet, the game ends in a draw.
+* Combat occurs independently on each ship and the planet
+   * Add strength of all cards on each side. If one side has more they get one bonus defense this combat.
+   * Add all strength and defense of one side and subtract all offense and strength of the other side for the new total strength of the defending side (you may not gain strength this way). Strength is removed from cards in a fifo order. 0 strength cards are deleted from the combat zone and will no longer apply their offense or defense or other ongoing effects.
+   * Repeat for the other side.
+* If on the planet an entrenched side has 0 cards left after combat, they lose the status of entrenched.
