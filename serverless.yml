@@ -12,7 +12,7 @@ package:
     - audio/**
     - test/**
     - speechAssets/**
-    - *.md
+    - "*.md"
     - package*.json
 
 functions:
