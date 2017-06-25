@@ -91,7 +91,7 @@ Choose attack -> Hear opponent's attack -> Choose defense
 * Defense goes to the planet or to your own ship.
 * Check each ship and the planets, three "combat zones", to see if victory has occurred
    * If this is a ship and the defense has 0 cards at the ship, the ship takes one damage. 2 damage and the ship is destroyed and the offensive team wins with a ship victory.
-   * If this is the planet and one side has 0 cards, the other side is now "entrenched". If they were already entrenched, they win with a planet victory.
+   * If this is the planet and one side has 0 cards, the other side is now "entrenched". If a side becomes entrenched when it was already entrenched, that side win with a planet victory.
    * If a ship victory and a planet victory happen at once, the ship victory takes precedence.  If two ship victories happen at once, whoever has the higher strength on the planet wins. If they have equal strength on the planet, the game ends in a draw.
 * Combat occurs independently on each ship and the planet
    * Add strength of all cards on each side. If one side has more they get one bonus defense this combat.
