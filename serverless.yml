@@ -1,7 +1,7 @@
 service:
   name: sensors-are-down-alexa-skill
 
-frameworkVersion: ">=1.4.0 <2.0.0"
+frameworkVersion: ">=1.8.0 <2.0.0"
 
 provider:
   name: aws
@@ -10,6 +10,10 @@ provider:
 package:
   exclude:
     - audio/**
+    - test/**
+    - speechAssets/**
+    - *.md
+    - package*.json
 
 functions:
   sensorsAreDown:
