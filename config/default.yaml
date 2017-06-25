@@ -33,7 +33,7 @@ cards:
     defense: true
     space: true
   assaultFrigates:
-    Name: Assault Frigates
+    name: Assault Frigates
     description: Assault Frigates are our strongest ships for space combat
     strength: 3
     offense: true

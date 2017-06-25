@@ -18,7 +18,9 @@ Go through the first few steps of setting up an Alexa skill:
 
 * Copy the Application Id that is now listed on this page to a temporary place, you'll need it.
 
-* On the Interaction Model page, use the contents of [`speechAssets/intents.json`](speechAssets/intents.json) for the Intent Schema section and use [`speechAssets/utterances.txt`](speechAssets/utterances.txt) for the Sample Utterances. Click Next.
+* Run `node speechAssets/generateCardCustomSlotType.js` from your base directory to generate a file needed in the next step.
+
+* On the Interaction Model page, use the contents of [`speechAssets/intents.json`](speechAssets/intents.json) for the Intent Schema section.  Then add a custom slot type called `CARD` and use the contents of your newly generated `speechAssets/CardCustomSlotType.txt` for the values. Lastly, use [`speechAssets/utterances.txt`](speechAssets/utterances.txt) for the Sample Utterances. Click Next.
 
 * On the Configuration page, for Service Endpoint Type, you want to select AWS Lambda ARN and pick your geography. Then fill the text box with the ARN that `serverless deploy -v` printed earlier. If you missed it, you can always run `serverless info -v` to get it again (It's the `SensorsAreDownLambdaFunctionQualifiedArn`). Note that you will need to exclude the version at the very end (`:1`), the ARN should end with `sensorsAreDown`.
 

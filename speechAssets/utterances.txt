@@ -2,3 +2,5 @@ NumberGuessIntent {number}
 NumberGuessIntent is it {number}
 NumberGuessIntent how about {number}
 NumberGuessIntent could it be {number}
+CardSelectIntent I choose {card}
+CardSelectIntent {card}
