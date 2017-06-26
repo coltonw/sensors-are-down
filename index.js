@@ -49,11 +49,7 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     this.attributes.gameState = store.getState();
     console.log('Player deck:');
     console.dir(store.getState().game.playerDeck);
-    const choiceNames = _.map(
-      _.values(store.getState().game.offenseCardChoices.playerCards),
-      value => value.name);
-    const choices = choiceNames.join(' or ');
-    this.emit(':ask', `Great! Would you like to deploy ${choices}?`, 'Try saying a number.');
+    this.emit('PickACard', store.getState().game.offenseCardChoices);
   },
   'AMAZON.NoIntent': function NoIntent() {
     console.log('NOINTENT');
@@ -102,6 +98,44 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
       this.emit('NotANum');
     }
   },
+  CardSelectIntent() {
+    const cardSelected = this.event.request.intent.slots.card.value.toLowerCase();
+    const store = engine.init(this.attributes.gameState);
+    const getChoices = (state) => {
+      if (state.game.defenseCardChoices) {
+        return state.game.defenseCardChoices.playerCards;
+      } else if (state.game.offenseCardChoices) {
+        return state.game.offenseCardChoices.playerCards;
+      }
+      return null;
+    };
+    const choices = getChoices(store.getState());
+    const match = _.find(Object.keys(choices), cardId => (
+      choices[cardId].name.toLowerCase() === cardSelected
+    ));
+    console.log(`Card picked: ${match}`);
+    if (match && choices) {
+      if (store.getState().game.defenseCardChoices) {
+        store.dispatch(engine.pickDefenseCard(match));
+      } else {
+        store.dispatch(engine.pickOffenseCard(match));
+      }
+      this.attributes.gameState = store.getState();
+      console.log('Player ship:');
+      console.dir(store.getState().game.ships.playerShip);
+      console.log('AI ship:');
+      console.dir(store.getState().game.ships.aiShip);
+      console.log('Planet:');
+      console.dir(store.getState().game.planet);
+      const newChoices = getChoices(store.getState());
+      this.emit('PickACard', newChoices);
+    } else if (choices) {
+      this.emit('NotAValidCard', choices);
+    } else {
+      // TODO: real error handling
+      this.emit('NotANum');
+    }
+  },
   'AMAZON.HelpIntent': function HelpIntent() {
     this.emit(':ask', 'I am thinking of a number between zero and one hundred, try to guess and I will tell you' +
             ' if it is higher or lower.', 'Try saying a number.');
@@ -126,6 +160,20 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
 
 // These handlers are not bound to a state
 const guessAttemptHandlers = {
+  PickACard(cardChoices) {
+    const choiceNames = _.map(
+      _.values(cardChoices.playerCards),
+      value => value.name);
+    const choices = choiceNames.join(', or ');
+    this.emit(':ask', `We currently have readied two tactics for you to choose between. Would you like to deploy ${choices}?`, `Pick either ${choices}.`);
+  },
+  NotAValidCard(cardChoices) {
+    const choiceNames = _.map(
+      _.values(cardChoices.playerCards),
+      value => value.name);
+    const choices = choiceNames.join(' or saying deploy ');
+    this.emit(':ask', `Sorry, I didn't get that. Try saying deploy ${choices}.`, `Try saying deploy ${choices}.`);
+  },
   TooHigh(val) {
     this.emit(':ask', `${val.toString()} is too high.`, 'Try saying a smaller number.');
   },
