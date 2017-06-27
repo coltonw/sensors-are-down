@@ -80,7 +80,7 @@ Choose attack -> Hear opponent's attack -> Choose defense
 1. Give player two attack choices. Choices are from the player's deck and have offense === true
 2. Player chooses attack action
 3. Choose opponent's attack (randomly for now)
-4. Speak opponent's attack to player and give player two defense choices. Choices are from the player's deck and have `defense === true` and ship or planet === opponent's attack ship or planet
+4. Speak opponent's attack to player and give player two defense choices.  Choices are from the player's deck and have `defense === true` and ship or planet === opponent's attack ship or planet and opponent cards in play on the ship or planet. If opponent cards in play and offensive choice cover both planet and ship, defense choices are always one planet defense option one ship defense option.
 5. Player chooses defense action
 6. Calculate if victory has occurred, if victory or defeat, skip to 10
 7. Calculate combat results. See next section.
