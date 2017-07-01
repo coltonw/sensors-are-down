@@ -42,7 +42,7 @@ cards:
   planetaryBombers:
     name: Planetary Bombers
     description: When the planet seems lost, the Planetary Bombers will destroy everything on it
-    special: 'precombat'
+    special: 'preplaycards'
     defense: true
     planet: true
   tankBattalion:

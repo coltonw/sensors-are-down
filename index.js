@@ -128,7 +128,11 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
       console.log('Planet:');
       console.dir(store.getState().game.planet);
       const newChoices = getChoices(store.getState());
-      this.emit('PickACard', newChoices);
+      if (newChoices) {
+        this.emit('PickACard', newChoices);
+      } else if (store.getState().gameEndResults) {
+        this.emit('EndOfGame', store.getState().gameEndResults);
+      }
     } else if (choices) {
       this.emit('NotAValidCard', choices);
     } else {
@@ -165,7 +169,46 @@ const guessAttemptHandlers = {
       _.values(cardChoices.playerCards),
       value => value.name);
     const choices = choiceNames.join(', or ');
-    this.emit(':ask', `We currently have readied two tactics for you to choose between. Would you like to deploy ${choices}?`, `Pick either ${choices}.`);
+    if (choiceNames.length > 0) {
+      this.emit(':ask', `We currently have readied ${choiceNames.length} tactics for you to choose between. Would you like to deploy ${choices}?`, `Pick either ${choices}.`);
+    } else {
+      // TODO: handle when we run out of choices
+      this.emit(':ask', 'You are currently out of tactics to deploy. Say <break strength="x-strong"/> um <break strength="x-strong"/> Mike please fix this.');
+    }
+  },
+  EndOfGame(gameEndResults) {
+    this.handler.state = states.STARTMODE;
+    this.attributes.gamesPlayed += 1;
+    const playAgainMsg = 'Thank you for playing! Would you like to play again?';
+    if (gameEndResults.playerShipDefeat) {
+      this.emit(':ask', `${'<say-as interpret-as="interjection">Great scott!</say-as> The ship has been irreversably damaged! We are going down!'
+          + ' <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />'}${
+           playAgainMsg}`);
+    } else if (gameEndResults.playerShipVictory) {
+      this.emit(':ask', `Good job! We have detroyed the enemy ship!${
+           playAgainMsg}`);
+    } else if (gameEndResults.playerPlanetVictory) {
+      this.emit(':ask', `Victory is ours! We have taken control of the planet!${
+           playAgainMsg}`);
+    } else if (gameEndResults.playerPlanetDefeat) {
+      this.emit(':ask', `We have lost the planet to the enemy. We must retreat before they set up planet to orbit missile barage!${
+           playAgainMsg}`);
+    } else if (gameEndResults.playerTiebreakerVictory) {
+      this.emit(':ask', `${'The ship is going down but it looks like we took them out too and have taken the planet. Our sacrifice will not be in vain!'
+          + ' <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />'}${
+           playAgainMsg}`);
+    } else if (gameEndResults.playerTiebreakerDefeat) {
+      this.emit(':ask', `${'Both ours and the enemy\'s ship is going down, but it looks like they are taking the planet. <say-as interpret-as="interjection">Phooey!</say-as>'
+          + ' <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />'}${
+           playAgainMsg}`);
+    } else if (gameEndResults.drawShipsDestroyed) {
+      this.emit(':ask', `${'Looks like no one gets the planet today, both ours and the enemy\'s ship are going down!'
+          + ' <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />'}${
+           playAgainMsg}`);
+    } else if (gameEndResults.drawStalemate) {
+      this.emit(':ask', `Huh, looks like we both ran out of steam. Today may be a draw but we will be back to take this planet!${
+           playAgainMsg}`);
+    }
   },
   NotAValidCard(cardChoices) {
     const choiceNames = _.map(
