@@ -165,6 +165,7 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
 // These handlers are not bound to a state
 const guessAttemptHandlers = {
   PickACard(cardChoices) {
+    // TODO: we should confirm with them what card they played and also what card the opponent played
     const choiceNames = _.map(
       _.values(cardChoices.playerCards),
       value => value.name);
@@ -172,7 +173,7 @@ const guessAttemptHandlers = {
     if (choiceNames.length > 0) {
       this.emit(':ask', `We currently have readied ${choiceNames.length} tactics for you to choose between. Would you like to deploy ${choices}?`, `Pick either ${choices}.`);
     } else {
-      // TODO: handle when we run out of choices
+      // TODO: handle when we run out of choices. I am thinking we just ask them to continue?
       this.emit(':ask', 'You are currently out of tactics to deploy. Say <break strength="x-strong"/> um <break strength="x-strong"/> Mike please fix this.');
     }
   },
