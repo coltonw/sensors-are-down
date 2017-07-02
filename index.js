@@ -103,15 +103,15 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
     const store = engine.init(this.attributes.gameState);
     const getChoices = (state) => {
       if (state.game.defenseCardChoices) {
-        return state.game.defenseCardChoices.playerCards;
+        return state.game.defenseCardChoices;
       } else if (state.game.offenseCardChoices) {
-        return state.game.offenseCardChoices.playerCards;
+        return state.game.offenseCardChoices;
       }
       return null;
     };
     const choices = getChoices(store.getState());
-    const match = _.find(Object.keys(choices), cardId => (
-      choices[cardId].name.toLowerCase() === cardSelected
+    const match = _.find(Object.keys(choices.playerCards), cardId => (
+      choices.playerCards[cardId].name.toLowerCase() === cardSelected
     ));
     console.log(`Card picked: ${match}`);
     if (match && choices) {
@@ -128,6 +128,8 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
       console.log('Planet:');
       console.dir(store.getState().game.planet);
       const newChoices = getChoices(store.getState());
+      console.log('New choices');
+      console.log(newChoices);
       if (newChoices) {
         this.emit('PickACard', newChoices);
       } else if (store.getState().gameEndResults) {

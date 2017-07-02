@@ -66,7 +66,7 @@ describe('engine', () => {
     }, 'defense on cards works properly');
   });
 
-  it('should properly play cards', () => {
+  it('should properly play your first card', () => {
     const store = engine.init(null);
     store.dispatch(engine.startGame());
     const firstCardId = Object.keys(store.getState().game.offenseCardChoices.playerCards)[0];
@@ -81,5 +81,19 @@ describe('engine', () => {
       ...store.getState().game.ships.aiShip.playerCards];
     assert.equal(allPlayerCardsInPlay.length, 1, 'there should be only one player card in play');
     assert.deepEqual(allPlayerCardsInPlay, [_.assign({}, firstCard, { cardId: firstCardId })], 'the card played should be in play');
+
+    const firstCardRemainingCount = store.getState().game.playerDeck[firstCardId] ?
+        store.getState().game.playerDeck[firstCardId].count : 0;
+    const firstCardOriginalCount = typeof firstCard.count === 'number' ? firstCard.count : 1;
+    assert.equal(firstCardRemainingCount, firstCardOriginalCount - 1, 'card played should have been removed from the player deck');
+  });
+
+  it('should properly present defense choices', () => {
+    const store = engine.init(null);
+    store.dispatch(engine.startGame());
+    const firstCardId = Object.keys(store.getState().game.offenseCardChoices.playerCards)[0];
+    store.dispatch(engine.pickOffenseCard(firstCardId));
+    console.dir(store.getState().game.playerDeck);
+    assert.equal(Object.keys(store.getState().game.defenseCardChoices.playerCards).length, 2, 'two choices are presented');
   });
 });
