@@ -93,7 +93,53 @@ describe('engine', () => {
     store.dispatch(engine.startGame());
     const firstCardId = Object.keys(store.getState().game.offenseCardChoices.playerCards)[0];
     store.dispatch(engine.pickOffenseCard(firstCardId));
-    console.dir(store.getState().game.playerDeck);
     assert.equal(Object.keys(store.getState().game.defenseCardChoices.playerCards).length, 2, 'two choices are presented');
+  });
+
+  it('should properly remove cards from opponent deck', () => {
+    const store = engine.init(null);
+    store.dispatch(engine.startGame());
+    const getTotalCardCount = deck => Object.keys(deck).reduce(
+      (count, cardId) => count + (deck[cardId].count || 1), 0);
+    const opponentCardCount = getTotalCardCount(store.getState().game.aiDeck);
+    store.dispatch(
+      engine.pickOffenseCard(Object.keys(store.getState().game.offenseCardChoices.playerCards)[0]));
+    const opponentNewCardCount = getTotalCardCount(store.getState().game.aiDeck);
+    assert.equal(opponentNewCardCount, opponentCardCount - 1, 'opponent card gets removed');
+    store.dispatch(
+      engine.pickDefenseCard(Object.keys(store.getState().game.defenseCardChoices.playerCards)[0]));
+    const opponentCardCountAfterDefense = getTotalCardCount(store.getState().game.aiDeck);
+    assert.equal(opponentCardCountAfterDefense, opponentCardCount - 2, 'opponent card gets removed after defense');
+  });
+
+  it('should resolve combat when it is meant to resolve', () => {
+    const initStore = engine.init(null);
+    const store = engine.init(_.assign({}, initStore.getState(), {
+      game: _.assign({}, initStore.getState().game, {
+        offenseCardChoices: {
+          playerCards: {},
+          aiCards: {},
+        },
+        defenseCardChoices: {
+          playerCards: {},
+          aiCards: {},
+        },
+        playerDeck: {},
+        aiDeck: {},
+
+        planet: _.assign({}, initStore.getState().game.planet, {
+          playerCards: [],
+          aiCards: [{ strength: 1 }],
+        }),
+      }),
+    }));
+
+    store.dispatch(engine.continueWithoutSelection());
+    assert(store.getState().game.planet.aiEntrenched, 'opponent is now entrenched');
+    store.dispatch(engine.continueWithoutSelection());
+    store.dispatch(engine.continueWithoutSelection());
+    assert.strictEqual(store.getState().game.offenseCardChoices, null, 'game is over, no more o card choices');
+    assert.strictEqual(store.getState().game.defenseCardChoices, null, 'game is over, no more d card choices');
+    assert(store.getState().game.gameEndResults.playerPlanetDefeat, 'opponent has now won');
   });
 });
