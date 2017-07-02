@@ -48,7 +48,7 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     store.dispatch(engine.startGame());
     this.attributes.gameState = store.getState();
     console.log('Player deck:');
-    console.dir(store.getState().game.playerDeck);
+    console.log(JSON.stringify(store.getState().game.playerDeck));
     this.emit('PickACard', '', store.getState().game.offenseCardChoices);
   },
   'AMAZON.NoIntent': function NoIntent() {
@@ -122,8 +122,8 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
         store.dispatch(engine.pickOffenseCard(match));
       }
       this.attributes.gameState = store.getState();
-      this.emit('DescribeRecentState', store.getState());
-    } else if (choices) {
+      this.emit('DescribeRecentState', '', store.getState());
+    } else if (choices && Object.keys(choices.playerCards).length > 0) {
       this.emit('NotAValidCard', choices);
     } else {
       // TODO: real error handling
@@ -155,15 +155,15 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
 
 // These handlers are not bound to a state
 const guessAttemptHandlers = {
-  DescribeRecentState(state) {
+  DescribeRecentState(messageSoFarArg, state) {
     console.log('Player ship:');
-    console.dir(state.game.ships.playerShip);
+    console.log(JSON.stringify(state.game.ships.playerShip));
     console.log('AI ship:');
-    console.dir(state.game.ships.aiShip);
+    console.log(JSON.stringify(state.game.ships.aiShip));
     console.log('Planet:');
-    console.dir(state.game.planet);
+    console.log(JSON.stringify(state.game.planet));
     const newChoices = getChoices(state);
-    let messageSoFar = '';
+    let messageSoFar = messageSoFarArg;
     if (state.game.defenseCardChoices) {
       const playerOffenseChoice = _.values(state.game.offenseCardChoices.playerCards)[0];
       if (playerOffenseChoice) {
@@ -179,9 +179,9 @@ const guessAttemptHandlers = {
       if (playerDefenseChoice) {
         messageSoFar += `You have deployed ${playerDefenseChoice.name} for defense. `;
       }
-      const aiDefenseChoice = _.values(state.game.offenseCardChoices.aiCards)[0];
+      const aiDefenseChoice = _.values(state.game.prevDefenseCardChoices.aiCards)[0];
       if (aiDefenseChoice) {
-        messageSoFar += `The opponent has dfended with ${aiDefenseChoice.name}. `;
+        messageSoFar += `The opponent has defended with ${aiDefenseChoice.name}. `;
       }
       messageSoFar += 'Time for the next offensive. ';
     }
@@ -191,26 +191,36 @@ const guessAttemptHandlers = {
       this.emit('EndOfGame', messageSoFar, state.game.gameEndResults);
     }
   },
+  PlayAutomatically(messageSoFar) {
+    console.log('Playing automatically');
+    const store = engine.init(this.attributes.gameState);
+    store.dispatch(engine.continueWithoutSelection());
+    this.attributes.gameState = store.getState();
+    this.emit('DescribeRecentState', messageSoFar, store.getState());
+  },
   PickACard(messageSoFar, cardChoices) {
-    // TODO: we should confirm with them what card they
-    // played and also what card the opponent played
+    console.log('Pick a card intent');
     const choiceNames = _.map(
       _.values(cardChoices.playerCards),
       value => value.name);
     const choices = choiceNames.join(', or ');
     let pickCardMsg;
     let pickCardReprompt;
-    if (choiceNames.length > 0) {
+    if (choiceNames.length === 1) {
+      pickCardMsg = `We currently have readied ${choices}. Please say ${choices} to deploy them.`;
+      pickCardReprompt = `Please say ${choices}.`;
+      this.emit(':ask', `${messageSoFar} ${pickCardMsg}`, pickCardReprompt);
+    } else if (choiceNames.length > 1) {
       pickCardMsg = `We currently have readied ${choiceNames.length} tactics for you to choose between. Would you like to deploy ${choices}?`;
       pickCardReprompt = `Pick either ${choices}.`;
+      this.emit(':ask', `${messageSoFar} ${pickCardMsg}`, pickCardReprompt);
     } else {
-      // TODO: handle when we run out of choices. I am thinking we just ask them to say continue?
-      // Or probably better we loop through the game describing each state until someone wins.
-      pickCardMsg = 'You are currently out of tactics to deploy. Say <break strength="x-strong"/> um <break strength="x-strong"/> Mike please fix this.';
+      this.emit('PlayAutomatically', messageSoFar);
     }
-    this.emit(':ask', `${messageSoFar} ${pickCardMsg}`, pickCardReprompt);
   },
   EndOfGame(messageSoFar, gameEndResults) {
+    console.log('End of game intent');
+    console.log(JSON.stringify(gameEndResults));
     this.handler.state = states.STARTMODE;
     this.attributes.gamesPlayed += 1;
     const playAgainMsg = 'Thank you for playing! Would you like to play again?';
