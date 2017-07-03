@@ -49,7 +49,7 @@ describe('engine', () => {
 
     const offenseWorksResult = engine.combatHelper({
       playerCards: [{ strength: 4, someIgnored: 'stuff' }],
-      aiCards: [{ strength: 3, offense: 2 }],
+      aiCards: [{ strength: 3, damageStrength: 2 }],
     });
     assert.deepEqual(offenseWorksResult, {
       playerCards: [],
@@ -58,11 +58,11 @@ describe('engine', () => {
 
     const defenseWorksResult = engine.combatHelper({
       playerCards: [{ strength: 4, someIgnored: 'stuff' }],
-      aiCards: [{ strength: 3, defense: 2 }],
+      aiCards: [{ strength: 3, shieldStrength: 2 }],
     });
     assert.deepEqual(defenseWorksResult, {
       playerCards: [{ strength: 2, someIgnored: 'stuff' }],
-      aiCards: [{ strength: 1, defense: 2 }],
+      aiCards: [{ strength: 1, shieldStrength: 2 }],
     }, 'defense on cards works properly');
   });
 
