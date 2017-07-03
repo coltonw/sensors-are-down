@@ -17,7 +17,7 @@ const newSessionHandlers = {
     this.handler.state = states.STARTMODE;
     this.emit(':ask', 'Welcome to sensors are down, a space combat game. ' +
             '<audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />' +
-            `You have played ${this.attributes.gamesPlayed.toString()} times. would you like to play?`,
+            'Would you like to play?',
             'Say yes to start the game or no to quit.');
   },
   'AMAZON.StopIntent': function StopIntent() {
@@ -107,6 +107,7 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
       this.emit('NotANum');
     }
   },
+  // TODO: add intent for not choosing not to defend
   CardSelectIntent() {
     const cardSelected = this.event.request.intent.slots.card.value.toLowerCase();
     const store = engine.init(this.attributes.gameState);
@@ -173,7 +174,9 @@ const guessAttemptHandlers = {
       if (aiOffenseChoice) {
         messageSoFar += `The opponent has deployed ${aiOffenseChoice.name}. `;
       }
-      messageSoFar += 'What defensive tactics would you like to deploy? ';
+      if (Object.keys(state.game.defenseCardChoices.playerCards).length > 0) {
+        messageSoFar += 'What defensive tactics would you like to deploy? ';
+      }
     } else {
       const playerDefenseChoice = _.values(state.game.prevDefenseCardChoices.playerCards)[0];
       if (playerDefenseChoice) {
@@ -183,11 +186,13 @@ const guessAttemptHandlers = {
       if (aiDefenseChoice) {
         messageSoFar += `The opponent has defended with ${aiDefenseChoice.name}. `;
       }
-      messageSoFar += 'Time for the next offensive. ';
+      if (state.game.offenseCardChoices) {
+        messageSoFar += 'Time for the next offensive. ';
+      }
     }
     if (newChoices) {
       this.emit('PickACard', messageSoFar, newChoices);
-    } else if (state.gameEndResults) {
+    } else if (state.game.gameEndResults) {
       this.emit('EndOfGame', messageSoFar, state.game.gameEndResults);
     }
   },
@@ -196,6 +201,8 @@ const guessAttemptHandlers = {
     const store = engine.init(this.attributes.gameState);
     store.dispatch(engine.continueWithoutSelection());
     this.attributes.gameState = store.getState();
+    // This can easilly lead to an infinite loop if we are in a degenerate state
+    // TODO: Better handle possible infinite loops
     this.emit('DescribeRecentState', messageSoFar, store.getState());
   },
   PickACard(messageSoFar, cardChoices) {
@@ -235,7 +242,7 @@ const guessAttemptHandlers = {
     } else if (gameEndResults.playerPlanetVictory) {
       gameResultMsg = 'Victory is ours! We have taken control of the planet!';
     } else if (gameEndResults.playerPlanetDefeat) {
-      gameResultMsg = 'We have lost the planet to the enemy. We must retreat before they set up planet to orbit missile barage!';
+      gameResultMsg = 'We have lost the planet to the enemy. We must retreat before they set up planet to orbit missile barrage!';
     } else if (gameEndResults.playerTiebreakerVictory) {
       gameResultMsg = `The ship is going down but it looks like we took them out too and have taken the planet. Our sacrifice will not be in vain!
           <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;

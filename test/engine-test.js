@@ -64,6 +64,13 @@ describe('engine', () => {
       playerCards: [{ strength: 2, someIgnored: 'stuff' }],
       aiCards: [{ strength: 1, shieldStrength: 2 }],
     }, 'defense on cards works properly');
+
+    const deleteAFewPreCombat = {
+      playerCards: [{ strength: 2 }, { strength: 1 }, { strength: 2 }],
+      aiCards: [{ strength: 3 }, { strength: 4 }],
+    };
+    const deleteAFewResult = engine.combatHelper(deleteAFewPreCombat);
+    assert.deepEqual(deleteAFewResult, { playerCards: [], aiCards: [{ strength: 3 }] }, 'even strength everything dies');
   });
 
   it('should properly play your first card', () => {
@@ -157,6 +164,34 @@ describe('engine', () => {
   });
 
   it('should resolve in stalemate at the right time', () => {
+    const initStore = engine.init(null);
+    const store = engine.init(_.assign({}, initStore.getState(), {
+      game: _.assign({}, initStore.getState().game, {
+        offenseCardChoices: {
+          playerCards: {},
+          aiCards: {},
+        },
+        defenseCardChoices: {
+          playerCards: {},
+          aiCards: {},
+        },
+        playerDeck: {},
+        aiDeck: {},
+
+        planet: _.assign({}, initStore.getState().game.planet, {
+          playerCards: [],
+          aiCards: [],
+        }),
+      }),
+    }));
+
+    store.dispatch(engine.continueWithoutSelection());
+    assert.strictEqual(store.getState().game.offenseCardChoices, null, 'game is over, no more o card choices');
+    assert.strictEqual(store.getState().game.defenseCardChoices, null, 'game is over, no more d card choices');
+    assert(store.getState().game.gameEndResults.drawStalemate, 'stalemate');
+  });
+
+  it('should resolve in stalemate when there are still ship defense cards', () => {
     const initStore = engine.init(null);
     const store = engine.init(_.assign({}, initStore.getState(), {
       game: _.assign({}, initStore.getState().game, {
