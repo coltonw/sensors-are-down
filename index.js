@@ -284,8 +284,8 @@ const guessAttemptHandlers = {
 // eslint-disable-next-line no-unused-vars
 exports.handler = function handler(event, context, callback) {
   const alexa = Alexa.handler(event, context);
-  alexa.appId = config.get('deployment.appId');
-  alexa.dynamoDBTableName = config.get('db.tableName');
+  alexa.appId = config.deployment.appId;
+  alexa.dynamoDBTableName = config.db.tableName;
   alexa.registerHandlers(newSessionHandlers,
     guessModeHandlers,
     startGameHandlers,

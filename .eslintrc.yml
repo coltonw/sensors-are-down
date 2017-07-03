@@ -2,8 +2,6 @@
   parserOptions:
     ecmaVersion: 2015
     sourceType: "module"
-    ecmaFeatures:
-      experimentalObjectRestSpread: false
 
   plugins:
     - node
@@ -18,3 +16,4 @@
 
   rules:
     no-console: off
+    node/no-unpublished-require: off

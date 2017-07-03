@@ -2,3 +2,5 @@ node_modules
 .serverless
 config/local.yaml
 speechAssets/CardCustomSlotType.txt
+.webpack
+build

@@ -7,13 +7,19 @@ provider:
   name: aws
   runtime: nodejs6.10
 
+plugins:
+  - serverless-plugin-webpack
+  - serverless-prune-plugin
+
+custom:
+  prune:
+    automatic: true
+    number: 3
+
 package:
-  exclude:
-    - audio/**
-    - test/**
-    - speechAssets/**
-    - "*.md"
-    - package*.json
+  individually: true
+  include:
+    - config/**
 
 functions:
   sensorsAreDown:
