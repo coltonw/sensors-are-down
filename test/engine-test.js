@@ -91,9 +91,20 @@ describe('engine', () => {
   it('should properly present defense choices', () => {
     const store = engine.init(null);
     store.dispatch(engine.startGame());
+    const planetDefenseCount = _.filter(
+      _.values(store.getState().game.playerDeck),
+      card => card.defense && card.planet).length;
+    const shipDefenseCount = _.filter(
+      _.values(store.getState().game.playerDeck),
+      card => card.defense && card.space).length;
     const firstCardId = Object.keys(store.getState().game.offenseCardChoices.playerCards)[0];
     store.dispatch(engine.pickOffenseCard(firstCardId));
-    assert.equal(Object.keys(store.getState().game.defenseCardChoices.playerCards).length, 2, 'two choices are presented');
+    // it is possible there are only 1 or even 0 cards in the deck that can defend against
+    // the card the opponent played. In that case, less than 2 cards will be presented
+    const applicableDefenseCardsCount =
+      _.values(store.getState().game.offenseCardChoices.aiCards)[0].space ?
+        shipDefenseCount : planetDefenseCount;
+    assert.equal(Object.keys(store.getState().game.defenseCardChoices.playerCards).length, Math.min(2, applicableDefenseCardsCount), 'two choices are presented');
   });
 
   it('should properly remove cards from opponent deck', () => {
@@ -109,6 +120,8 @@ describe('engine', () => {
     store.dispatch(
       engine.pickDefenseCard(Object.keys(store.getState().game.defenseCardChoices.playerCards)[0]));
     const opponentCardCountAfterDefense = getTotalCardCount(store.getState().game.aiDeck);
+    // This test may randomly fail in the very rare case the opponent
+    // has no defense choices against your offense choice
     assert.equal(opponentCardCountAfterDefense, opponentCardCount - 2, 'opponent card gets removed after defense');
   });
 
@@ -141,5 +154,33 @@ describe('engine', () => {
     assert.strictEqual(store.getState().game.offenseCardChoices, null, 'game is over, no more o card choices');
     assert.strictEqual(store.getState().game.defenseCardChoices, null, 'game is over, no more d card choices');
     assert(store.getState().game.gameEndResults.playerPlanetDefeat, 'opponent has now won');
+  });
+
+  it('should resolve in stalemate at the right time', () => {
+    const initStore = engine.init(null);
+    const store = engine.init(_.assign({}, initStore.getState(), {
+      game: _.assign({}, initStore.getState().game, {
+        offenseCardChoices: {
+          playerCards: {},
+          aiCards: {},
+        },
+        defenseCardChoices: {
+          playerCards: {},
+          aiCards: {},
+        },
+        playerDeck: {},
+        aiDeck: {},
+
+        planet: _.assign({}, initStore.getState().game.planet, {
+          playerCards: [],
+          aiCards: [],
+        }),
+      }),
+    }));
+
+    store.dispatch(engine.continueWithoutSelection());
+    assert.strictEqual(store.getState().game.offenseCardChoices, null, 'game is over, no more o card choices');
+    assert.strictEqual(store.getState().game.defenseCardChoices, null, 'game is over, no more d card choices');
+    assert(store.getState().game.gameEndResults.drawStalemate, 'stalemate');
   });
 });

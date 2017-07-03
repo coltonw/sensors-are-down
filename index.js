@@ -225,6 +225,8 @@ const guessAttemptHandlers = {
     this.attributes.gamesPlayed += 1;
     const playAgainMsg = 'Thank you for playing! Would you like to play again?';
     let gameResultMsg = 'Unexpected game result.';
+    console.log('game results');
+    console.log(JSON.stringify(gameEndResults));
     if (gameEndResults.playerShipDefeat) {
       gameResultMsg = `<say-as interpret-as="interjection">Great scott!</say-as> The ship has been irreversably damaged! We are going down!
           <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;
@@ -246,6 +248,7 @@ const guessAttemptHandlers = {
     } else if (gameEndResults.drawStalemate) {
       gameResultMsg = 'Huh, looks like we both ran out of steam. Today may be a draw but we will be back to take this planet!';
     }
+    console.log(`${messageSoFar} ${gameResultMsg} ${playAgainMsg}`);
     this.emit(':ask', `${messageSoFar} ${gameResultMsg} ${playAgainMsg}`);
   },
   NotAValidCard(cardChoices) {
