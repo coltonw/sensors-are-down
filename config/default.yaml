@@ -19,8 +19,8 @@ cards:
     # count: number of times card is can be used before card is removed from deck (defaults to 1)
   relentlessSwarm:
     name: Relentless Swarm
-    description: Relentless Swarm are weak ships but we are stocked with 4 rounds of them
-    strength: 1
+    description: Relentless Swarm are weak ships but we are stocked with 5 rounds of them
+    strength: 2
     offense: true
     defense: true
     space: true
@@ -28,14 +28,14 @@ cards:
   ionTurrets:
     name: Ion Turrets
     description: Ion Turrets are tough. Hopefully they will hold
-    strength: 2
+    strength: 3
     shieldStrength: 1
     defense: true
     space: true
   assaultFrigates:
     name: Assault Frigates
     description: Assault Frigates are our strongest ships for space combat
-    strength: 3
+    strength: 4
     offense: true
     defense: true
     space: true
@@ -43,12 +43,13 @@ cards:
     name: Planetary Bombers
     description: When the planet seems lost, the Planetary Bombers will destroy everything on it
     special: 'preplaycards'
+    strength: 1
     defense: true
     planet: true
   tankBattalion:
     name: Tank Battalion
     description: The Tank Battalion is boring in its consistency
-    strength: 2
+    strength: 3
     offense: true
     defense: true
     planet: true
@@ -56,9 +57,26 @@ cards:
   groundTroops:
     name: Ground Troops
     description: Ground Troops are pretty much worthless. But we throw'em down there just to disrupt things.
-    strength: 1
+    strength: 2
     damageStrength: 1
     offense: true
     defense: true
     planet: true
     count: 4
+  scrapHarvesters:
+    name: Scrap Harvesters
+    description: Our Scrap Harvesters fly in and can upgrade themselves with scrap from a defeated enemy
+    special: 'postcombat'
+    strength: 3
+    offense: true
+    space: true
+    count: 2
+  nanightStorm:
+    name: Nanight Storm
+    description: The Nanight Storm descends on the planet like a cloud then comes back to partially re-energize before attacking again
+    strength: 5
+    special: 'preplaycards'
+    offense: true
+    defense: true
+    planet: true
+    count: 2
