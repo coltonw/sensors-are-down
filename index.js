@@ -17,7 +17,7 @@ const newSessionHandlers = {
     this.handler.state = states.STARTMODE;
     this.emit(':ask', 'Welcome to sensors are down, a space combat game. ' +
             '<audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />' +
-            `You have played ${this.attributes.gamesPlayed.toString()} times. would you like to play?`,
+            'Would you like to play?',
             'Say yes to start the game or no to quit.');
   },
   'AMAZON.StopIntent': function StopIntent() {
@@ -48,8 +48,8 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     store.dispatch(engine.startGame());
     this.attributes.gameState = store.getState();
     console.log('Player deck:');
-    console.dir(store.getState().game.playerDeck);
-    this.emit('PickACard', store.getState().game.offenseCardChoices);
+    console.log(JSON.stringify(store.getState().game.playerDeck));
+    this.emit('PickACard', '', store.getState().game.offenseCardChoices);
   },
   'AMAZON.NoIntent': function NoIntent() {
     console.log('NOINTENT');
@@ -73,6 +73,15 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     this.emit(':ask', message, message);
   },
 });
+
+const getChoices = (state) => {
+  if (state.game.defenseCardChoices) {
+    return state.game.defenseCardChoices;
+  } else if (state.game.offenseCardChoices) {
+    return state.game.offenseCardChoices;
+  }
+  return null;
+};
 
 const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
   NewSession() {
@@ -98,20 +107,13 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
       this.emit('NotANum');
     }
   },
+  // TODO: add intent for not choosing not to defend
   CardSelectIntent() {
     const cardSelected = this.event.request.intent.slots.card.value.toLowerCase();
     const store = engine.init(this.attributes.gameState);
-    const getChoices = (state) => {
-      if (state.game.defenseCardChoices) {
-        return state.game.defenseCardChoices.playerCards;
-      } else if (state.game.offenseCardChoices) {
-        return state.game.offenseCardChoices.playerCards;
-      }
-      return null;
-    };
     const choices = getChoices(store.getState());
-    const match = _.find(Object.keys(choices), cardId => (
-      choices[cardId].name.toLowerCase() === cardSelected
+    const match = _.find(Object.keys(choices.playerCards), cardId => (
+      choices.playerCards[cardId].name.toLowerCase() === cardSelected
     ));
     console.log(`Card picked: ${match}`);
     if (match && choices) {
@@ -121,21 +123,15 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
         store.dispatch(engine.pickOffenseCard(match));
       }
       this.attributes.gameState = store.getState();
-      console.log('Player ship:');
-      console.dir(store.getState().game.ships.playerShip);
-      console.log('AI ship:');
-      console.dir(store.getState().game.ships.aiShip);
-      console.log('Planet:');
-      console.dir(store.getState().game.planet);
-      const newChoices = getChoices(store.getState());
-      this.emit('PickACard', newChoices);
-    } else if (choices) {
+      this.emit('DescribeRecentState', '', store.getState());
+    } else if (choices && Object.keys(choices.playerCards).length > 0) {
       this.emit('NotAValidCard', choices);
     } else {
       // TODO: real error handling
       this.emit('NotANum');
     }
   },
+  // TODO: add yes intent for when there is only one choice to deploy
   'AMAZON.HelpIntent': function HelpIntent() {
     this.emit(':ask', 'I am thinking of a number between zero and one hundred, try to guess and I will tell you' +
             ' if it is higher or lower.', 'Try saying a number.');
@@ -160,12 +156,107 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
 
 // These handlers are not bound to a state
 const guessAttemptHandlers = {
-  PickACard(cardChoices) {
+  DescribeRecentState(messageSoFarArg, state) {
+    console.log('Player ship:');
+    console.log(JSON.stringify(state.game.ships.playerShip));
+    console.log('AI ship:');
+    console.log(JSON.stringify(state.game.ships.aiShip));
+    console.log('Planet:');
+    console.log(JSON.stringify(state.game.planet));
+    const newChoices = getChoices(state);
+    let messageSoFar = messageSoFarArg;
+    if (state.game.defenseCardChoices) {
+      const playerOffenseChoice = _.values(state.game.offenseCardChoices.playerCards)[0];
+      if (playerOffenseChoice) {
+        messageSoFar += `You have deployed ${playerOffenseChoice.name}. `;
+      }
+      const aiOffenseChoice = _.values(state.game.offenseCardChoices.aiCards)[0];
+      if (aiOffenseChoice) {
+        messageSoFar += `The opponent has deployed ${aiOffenseChoice.name}. `;
+      }
+      if (Object.keys(state.game.defenseCardChoices.playerCards).length > 0) {
+        messageSoFar += 'What defensive tactics would you like to deploy? ';
+      }
+    } else {
+      const playerDefenseChoice = _.values(state.game.prevDefenseCardChoices.playerCards)[0];
+      if (playerDefenseChoice) {
+        messageSoFar += `You have deployed ${playerDefenseChoice.name} for defense. `;
+      }
+      const aiDefenseChoice = _.values(state.game.prevDefenseCardChoices.aiCards)[0];
+      if (aiDefenseChoice) {
+        messageSoFar += `The opponent has defended with ${aiDefenseChoice.name}. `;
+      }
+      if (state.game.offenseCardChoices) {
+        messageSoFar += 'Time for the next offensive. ';
+      }
+    }
+    if (newChoices) {
+      this.emit('PickACard', messageSoFar, newChoices);
+    } else if (state.game.gameEndResults) {
+      this.emit('EndOfGame', messageSoFar, state.game.gameEndResults);
+    }
+  },
+  PlayAutomatically(messageSoFar) {
+    console.log('Playing automatically');
+    const store = engine.init(this.attributes.gameState);
+    store.dispatch(engine.continueWithoutSelection());
+    this.attributes.gameState = store.getState();
+    // This can easilly lead to an infinite loop if we are in a degenerate state
+    // TODO: Better handle possible infinite loops
+    this.emit('DescribeRecentState', messageSoFar, store.getState());
+  },
+  PickACard(messageSoFar, cardChoices) {
+    console.log('Pick a card intent');
     const choiceNames = _.map(
       _.values(cardChoices.playerCards),
       value => value.name);
     const choices = choiceNames.join(', or ');
-    this.emit(':ask', `We currently have readied two tactics for you to choose between. Would you like to deploy ${choices}?`, `Pick either ${choices}.`);
+    let pickCardMsg;
+    let pickCardReprompt;
+    if (choiceNames.length === 1) {
+      pickCardMsg = `We currently have readied ${choices}. Please say ${choices} to deploy them.`;
+      pickCardReprompt = `Please say ${choices}.`;
+      this.emit(':ask', `${messageSoFar} ${pickCardMsg}`, pickCardReprompt);
+    } else if (choiceNames.length > 1) {
+      pickCardMsg = `We currently have readied ${choiceNames.length} tactics for you to choose between. Would you like to deploy ${choices}?`;
+      pickCardReprompt = `Pick either ${choices}.`;
+      this.emit(':ask', `${messageSoFar} ${pickCardMsg}`, pickCardReprompt);
+    } else {
+      this.emit('PlayAutomatically', messageSoFar);
+    }
+  },
+  EndOfGame(messageSoFar, gameEndResults) {
+    console.log('End of game intent');
+    console.log(JSON.stringify(gameEndResults));
+    this.handler.state = states.STARTMODE;
+    this.attributes.gamesPlayed += 1;
+    const playAgainMsg = 'Thank you for playing! Would you like to play again?';
+    let gameResultMsg = 'Unexpected game result.';
+    console.log('game results');
+    console.log(JSON.stringify(gameEndResults));
+    if (gameEndResults.playerShipDefeat) {
+      gameResultMsg = `<say-as interpret-as="interjection">Great scott!</say-as> The ship has been irreversably damaged! We are going down!
+          <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;
+    } else if (gameEndResults.playerShipVictory) {
+      gameResultMsg = 'Good job! We have detroyed the enemy ship!';
+    } else if (gameEndResults.playerPlanetVictory) {
+      gameResultMsg = 'Victory is ours! We have taken control of the planet!';
+    } else if (gameEndResults.playerPlanetDefeat) {
+      gameResultMsg = 'We have lost the planet to the enemy. We must retreat before they set up planet to orbit missile barrage!';
+    } else if (gameEndResults.playerTiebreakerVictory) {
+      gameResultMsg = `The ship is going down but it looks like we took them out too and have taken the planet. Our sacrifice will not be in vain!
+          <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;
+    } else if (gameEndResults.playerTiebreakerDefeat) {
+      gameResultMsg = `Both ours and the enemy's ship is going down, but it looks like they are taking the planet. <say-as interpret-as="interjection">Phooey!</say-as>
+          <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;
+    } else if (gameEndResults.drawShipsDestroyed) {
+      gameResultMsg = `Looks like no one gets the planet today, both ours and the enemy's ship are going down!
+          <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;
+    } else if (gameEndResults.drawStalemate) {
+      gameResultMsg = 'Huh, looks like we both ran out of steam. Today may be a draw but we will be back to take this planet!';
+    }
+    console.log(`${messageSoFar} ${gameResultMsg} ${playAgainMsg}`);
+    this.emit(':ask', `${messageSoFar} ${gameResultMsg} ${playAgainMsg}`);
   },
   NotAValidCard(cardChoices) {
     const choiceNames = _.map(
@@ -193,8 +284,8 @@ const guessAttemptHandlers = {
 // eslint-disable-next-line no-unused-vars
 exports.handler = function handler(event, context, callback) {
   const alexa = Alexa.handler(event, context);
-  alexa.appId = config.get('deployment.appId');
-  alexa.dynamoDBTableName = config.get('db.tableName');
+  alexa.appId = config.deployment.appId;
+  alexa.dynamoDBTableName = config.db.tableName;
   alexa.registerHandlers(newSessionHandlers,
     guessModeHandlers,
     startGameHandlers,

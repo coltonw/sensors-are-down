@@ -1,0 +1,17 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+        "target": {
+          "node": "6.10"
+        },
+        "useBuiltIns": true,
+        "modules": false,
+        "loose": true
+      }
+    ],
+    "stage-3",
+    "flow"
+  ]
+}
