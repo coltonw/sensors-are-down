@@ -1,6 +1,7 @@
 const assert = require('assert');
 const _ = require('lodash');
 const engine = require('../lib/engine');
+const { combatHelper } = require('../lib/reducers');
 
 describe('engine', () => {
   it('should initialize properly', () => {
@@ -20,7 +21,7 @@ describe('engine', () => {
       aiCards: [],
       keepYour: 'mangy hands off me',
     };
-    const noCardsResult = engine.combatHelper(noCardsPreCombat);
+    const noCardsResult = combatHelper(noCardsPreCombat);
     assert.deepEqual(noCardsResult, noCardsPreCombat, 'no cards to still no cards');
 
     const oneSideCardsPreCombat = {
@@ -28,17 +29,17 @@ describe('engine', () => {
       aiCards: [],
       pleaseDont: 'touch this',
     };
-    const oneSideCardsResult = engine.combatHelper(oneSideCardsPreCombat);
+    const oneSideCardsResult = combatHelper(oneSideCardsPreCombat);
     assert.deepEqual(oneSideCardsResult, oneSideCardsPreCombat, 'one card to still one card');
 
     const evenStrengthPreCombat = {
       playerCards: [{ strength: 2 }, { strength: 1 }],
       aiCards: [{ strength: 3 }],
     };
-    const evenStrengthResult = engine.combatHelper(evenStrengthPreCombat);
+    const evenStrengthResult = combatHelper(evenStrengthPreCombat);
     assert.deepEqual(evenStrengthResult, { playerCards: [], aiCards: [] }, 'even strength everything dies');
 
-    const defenseBonusWorksResult = engine.combatHelper({
+    const defenseBonusWorksResult = combatHelper({
       playerCards: [{ strength: 4, someIgnored: 'stuff' }],
       aiCards: [{ strength: 3 }],
     });
@@ -47,7 +48,7 @@ describe('engine', () => {
       aiCards: [],
     }, 'defense bonus works as expected');
 
-    const offenseWorksResult = engine.combatHelper({
+    const offenseWorksResult = combatHelper({
       playerCards: [{ strength: 4, someIgnored: 'stuff' }],
       aiCards: [{ strength: 3, damageStrength: 2 }],
     });
@@ -56,7 +57,7 @@ describe('engine', () => {
       aiCards: [],
     }, 'offense on cards works properly');
 
-    const defenseWorksResult = engine.combatHelper({
+    const defenseWorksResult = combatHelper({
       playerCards: [{ strength: 4, someIgnored: 'stuff' }],
       aiCards: [{ strength: 3, shieldStrength: 2 }],
     });
@@ -69,7 +70,7 @@ describe('engine', () => {
       playerCards: [{ strength: 2 }, { strength: 1 }, { strength: 2 }],
       aiCards: [{ strength: 3 }, { strength: 4 }],
     };
-    const deleteAFewResult = engine.combatHelper(deleteAFewPreCombat);
+    const deleteAFewResult = combatHelper(deleteAFewPreCombat);
     assert.deepEqual(deleteAFewResult, { playerCards: [], aiCards: [{ strength: 3 }] }, 'even strength everything dies');
   });
 
