@@ -19,7 +19,7 @@ cards:
     # count: number of times card is can be used before card is removed from deck (defaults to 1)
   relentlessSwarm:
     name: Relentless Swarm
-    description: Relentless Swarm are weak ships but we are stocked with 5 rounds of them
+    description: Relentless Swarm are weak ships but we are stocked with 4 rounds of them
     strength: 2
     offense: true
     defense: true

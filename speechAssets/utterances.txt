@@ -6,3 +6,7 @@ CardSelectIntent {card}
 CardSelectIntent I choose {card}
 CardSelectIntent deploy {card}
 CardSelectIntent I would like to deploy {card}
+DescribeIntent describe these cards
+DescribeIntent describe
+DescribeIntent explain
+DescribeIntent tell me more

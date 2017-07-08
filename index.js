@@ -107,7 +107,7 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
       this.emit('NotANum');
     }
   },
-  // TODO: add intent for not choosing not to defend
+  // TODO: add intent for choosing not to defend
   CardSelectIntent() {
     const cardSelected = this.event.request.intent.slots.card.value.toLowerCase();
     const store = engine.init(this.attributes.gameState);
@@ -130,6 +130,18 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
       // TODO: real error handling
       this.emit('NotANum');
     }
+  },
+  DescribeIntent() {
+    console.log('Describe intent');
+    const store = engine.init(this.attributes.gameState);
+    const cardChoices = getChoices(store.getState());
+    let messageSoFar = '';
+    const choiceDescs = _.map(
+      _.values(cardChoices.playerCards),
+      value => value.description);
+    messageSoFar += [...choiceDescs, ''].join(' <break strength="x-strong" /> ');
+
+    this.emit('PickACard', messageSoFar, cardChoices);
   },
   // TODO: add yes intent for when there is only one choice to deploy
   'AMAZON.HelpIntent': function HelpIntent() {
@@ -157,6 +169,10 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
 // These handlers are not bound to a state
 const guessAttemptHandlers = {
   DescribeRecentState(messageSoFarArg, state) {
+    console.log('Player deck:');
+    console.log(JSON.stringify(state.game.playerDeck));
+    console.log('AI deck:');
+    console.log(JSON.stringify(state.game.aiDeck));
     console.log('Player ship:');
     console.log(JSON.stringify(state.game.ships.playerShip));
     console.log('AI ship:');
@@ -178,13 +194,33 @@ const guessAttemptHandlers = {
         messageSoFar += 'What defensive tactics would you like to deploy? ';
       }
     } else {
+      const survived = (defenseChoice, myShip, opponentCards) => {
+        if (defenseChoice.planet) {
+          return state.game.planet[opponentCards];
+        } else if (defenseChoice.space) {
+          return state.game.ships[myShip][opponentCards];
+        }
+        return [];
+      };
       const playerDefenseChoice = _.values(state.game.prevDefenseCardChoices.playerCards)[0];
       if (playerDefenseChoice) {
         messageSoFar += `You have deployed ${playerDefenseChoice.name} for defense. `;
+        const aiSurvivors = survived(playerDefenseChoice, 'playerShip', 'aiCards');
+        if (aiSurvivors.length > 0) {
+          const aiSurvivorNames = aiSurvivors.map(card => card.name).join(' and ');
+          messageSoFar += `Unfortunately, ${aiSurvivorNames} have survived your defense. `;
+        }
+        messageSoFar += ' <break strength="x-strong" /> ';
       }
       const aiDefenseChoice = _.values(state.game.prevDefenseCardChoices.aiCards)[0];
       if (aiDefenseChoice) {
         messageSoFar += `The opponent has defended with ${aiDefenseChoice.name}. `;
+        const playerSurvivors = survived(aiDefenseChoice, 'aiShip', 'playerCards');
+        if (playerSurvivors.length > 0) {
+          const playerSurvivorNames = playerSurvivors.map(card => card.name).join(' and ');
+          messageSoFar += `Fortunately, ${playerSurvivorNames} have survived the enemy's defense. `;
+        }
+        messageSoFar += ' <break strength="x-strong" /> ';
       }
       if (state.game.offenseCardChoices) {
         messageSoFar += 'Time for the next offensive. ';
