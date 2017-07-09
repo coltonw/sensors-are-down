@@ -48,7 +48,7 @@ cards:
     planet: true
   tankBattalion:
     name: Tank Battalion
-    description: The Tank Battalion is boring in its consistency
+    description: The Tank Battalion is consistent planet battler
     strength: 3
     offense: true
     defense: true

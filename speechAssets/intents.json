@@ -3,6 +3,7 @@
     {"intent": "CardSelectIntent", "slots": [{"name": "card", "type": "CARD"}]},
     {"intent": "NumberGuessIntent", "slots": [{"name": "number", "type": "AMAZON.NUMBER"}]},
     {"intent": "DescribeIntent"},
+    {"intent": "HowToPlayIntent"},
     {"intent": "AMAZON.YesIntent"},
     {"intent": "AMAZON.NoIntent"},
     {"intent": "AMAZON.HelpIntent"},

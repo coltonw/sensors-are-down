@@ -18,7 +18,7 @@ const newSessionHandlers = {
     this.emit(':ask', 'Welcome to sensors are down, a space combat game. ' +
             '<audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />' +
             'Would you like to play?',
-            'Say yes to start the game or no to quit.');
+            'Say yes to start the game, no to quit, or how to play to learn how to play.');
   },
   'AMAZON.StopIntent': function StopIntent() {
     this.emit(':tell', 'Goodbye!');
@@ -37,9 +37,7 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     this.emit('NewSession'); // Uses the handler in newSessionHandlers
   },
   'AMAZON.HelpIntent': function HelpIntent() {
-    const message = 'I will think of a number between zero and one hundred, try to guess and I will tell you if it' +
-            ' is higher or lower. Do you want to start the game?';
-    this.emit(':ask', message, message);
+    this.emit('HowToPlayIntent');
   },
   'AMAZON.YesIntent': function YesIntent() {
     this.attributes.guessNumber = Math.floor(Math.random() * 100);
@@ -54,6 +52,12 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
   'AMAZON.NoIntent': function NoIntent() {
     console.log('NOINTENT');
     this.emit(':tell', 'Ok, see you next time!');
+  },
+  HowToPlayIntent() {
+    const message = 'The goal of the game is to destroy your opponent\'s ship with 2 undefended attacks or to take over the planet with two undefended attacks. <break strength="strong" /> There are 3 combat zones: your ship, the opponent\'s ship, and the planet you ' +
+      'are both fighting over. Every round you will get a choice between two offensive tactics. These tactics will ' +
+      'attack either the planet or <emphasis level="strong">the opponent\'s</emphasis> ship. You can get a description of the tactics by saying describe. You will be told what your opponent picked for their offensive tactic to attack the planet or <emphasis level="strong">your</emphasis> ship. Then you will get a choice between two defensive tactics which respond either to the opponent\'s offense or to ongoing combat on the planet or your ship. Once all these choices have been made, all deployed tactics as well as tactics which survived previous rounds attack each other. You win if you have 2 undefended attacks on either the opponent\'s ship or the planet. <break strength="x-strong" /> Do you want to play?';
+    this.emit(':ask', message, 'Do you want to play?');
   },
   'AMAZON.StopIntent': function StopIntent() {
     console.log('STOPINTENT');
@@ -136,6 +140,7 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
     const store = engine.init(this.attributes.gameState);
     const cardChoices = getChoices(store.getState());
     let messageSoFar = '';
+    // TODO: also describe the opponent's offensive choice when defending
     const choiceDescs = _.map(
       _.values(cardChoices.playerCards),
       value => value.description);
@@ -194,31 +199,66 @@ const guessAttemptHandlers = {
         messageSoFar += 'What defensive tactics would you like to deploy? ';
       }
     } else {
-      const survived = (defenseChoice, myShip, opponentCards) => {
+      const survived = (defenseChoice, myShip, cardsKey) => {
         if (defenseChoice.planet) {
-          return state.game.planet[opponentCards];
+          return state.game.planet[cardsKey];
         } else if (defenseChoice.space) {
-          return state.game.ships[myShip][opponentCards];
+          return state.game.ships[myShip][cardsKey];
         }
         return [];
       };
       const playerDefenseChoice = _.values(state.game.prevDefenseCardChoices.playerCards)[0];
+      const aiDefenseChoice = _.values(state.game.prevDefenseCardChoices.aiCards)[0];
+      const allPlanetDefense = playerDefenseChoice && aiDefenseChoice &&
+        playerDefenseChoice.planet && aiDefenseChoice.planet;
       if (playerDefenseChoice) {
         messageSoFar += `You have deployed ${playerDefenseChoice.name} for defense. `;
-        const aiSurvivors = survived(playerDefenseChoice, 'playerShip', 'aiCards');
-        if (aiSurvivors.length > 0) {
-          const aiSurvivorNames = aiSurvivors.map(card => card.name).join(' and ');
-          messageSoFar += `Unfortunately, ${aiSurvivorNames} have survived your defense. `;
+        if (!allPlanetDefense) {
+          const aiSurvivors = survived(playerDefenseChoice, 'playerShip', 'aiCards');
+          if (aiSurvivors.length > 0) {
+            const aiSurvivorNames = aiSurvivors.map(card => card.name).join(' and ');
+            messageSoFar += `Unfortunately, ${aiSurvivorNames} have survived your defense. `;
+          } else {
+            messageSoFar += 'Your defense successfully destroyed all enemies. ';
+          }
+          const playerSurvivors = survived(playerDefenseChoice, 'playerShip', 'playerCards');
+          if (playerSurvivors.length > 0) {
+            const playerSurvivorNames = playerSurvivors.map(card => card.name).join(' and ');
+            messageSoFar += `Your ${playerSurvivorNames} have survived the defense. `;
+          } else {
+            messageSoFar += 'All your defenders perished. ';
+          }
         }
         messageSoFar += ' <break strength="x-strong" /> ';
       }
-      const aiDefenseChoice = _.values(state.game.prevDefenseCardChoices.aiCards)[0];
       if (aiDefenseChoice) {
         messageSoFar += `The opponent has defended with ${aiDefenseChoice.name}. `;
-        const playerSurvivors = survived(aiDefenseChoice, 'aiShip', 'playerCards');
-        if (playerSurvivors.length > 0) {
-          const playerSurvivorNames = playerSurvivors.map(card => card.name).join(' and ');
-          messageSoFar += `Fortunately, ${playerSurvivorNames} have survived the enemy's defense. `;
+        if (!allPlanetDefense) {
+          const playerSurvivors = survived(aiDefenseChoice, 'aiShip', 'playerCards');
+          if (playerSurvivors.length > 0) {
+            const playerSurvivorNames = playerSurvivors.map(card => card.name).join(' and ');
+            messageSoFar += `Fortunately, ${playerSurvivorNames} have survived the enemy's defense. `;
+          } else {
+            messageSoFar += 'Sadly, their defense decimated our forces. ';
+          }
+          const aiSurvivors = survived(aiDefenseChoice, 'aiShip', 'aiCards');
+          if (aiSurvivors.length > 0) {
+            const aiSurvivorNames = aiSurvivors.map(card => card.name).join(' and ');
+            messageSoFar += `The enemies forces of ${aiSurvivorNames} still stand after the enemy's defense. `;
+          } else {
+            messageSoFar += 'Their defensive forces are no more. ';
+          }
+        }
+        messageSoFar += ' <break strength="x-strong" /> ';
+      }
+      if (allPlanetDefense) {
+        if (state.game.planet.playerCards.length > 0) {
+          const playerSurvivorNames = state.game.planet.playerCards.map(card => card.name).join(' and ');
+          messageSoFar += `Fortunately, ${playerSurvivorNames} have survived the battle on the planet. `;
+        }
+        if (state.game.planet.aiCards.length > 0) {
+          const aiSurvivorNames = state.game.planet.aiCards.map(card => card.name).join(' and ');
+          messageSoFar += `Unfortunately, ${aiSurvivorNames} have survived the battle on the planet. `;
         }
         messageSoFar += ' <break strength="x-strong" /> ';
       }

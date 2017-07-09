@@ -10,3 +10,6 @@ DescribeIntent describe these cards
 DescribeIntent describe
 DescribeIntent explain
 DescribeIntent tell me more
+HowToPlayIntent how to play
+HowToPlayIntent instructions
+HowToPlayIntent how do I play
