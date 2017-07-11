@@ -54,9 +54,9 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     this.emit(':tell', 'Ok, see you next time!');
   },
   HowToPlayIntent() {
-    const message = 'The goal of the game is to destroy your opponent\'s ship with 2 undefended attacks or to take over the planet with two undefended attacks. <break strength="strong" /> There are 3 combat zones: your ship, the opponent\'s ship, and the planet you ' +
+    const message = '<prosody rate="90%">The goal of the game is to destroy your opponent\'s ship or to take over the planet. <break strength="strong" /> There are 3 combat zones: your ship, the opponent\'s ship, and the planet you ' +
       'are both fighting over. Every round you will get a choice between two offensive tactics. These tactics will ' +
-      'attack either the planet or <emphasis level="strong">the opponent\'s</emphasis> ship. You can get a description of the tactics by saying describe. You will be told what your opponent picked for their offensive tactic to attack the planet or <emphasis level="strong">your</emphasis> ship. Then you will get a choice between two defensive tactics which respond either to the opponent\'s offense or to ongoing combat on the planet or your ship. Once all these choices have been made, all deployed tactics as well as tactics which survived previous rounds attack each other. You win if you have 2 undefended attacks on either the opponent\'s ship or the planet. <break strength="x-strong" /> Do you want to play?';
+      'attack either the planet or <prosody volume="loud">the opponent\'s</prosody> ship. You can get a description of the tactics by saying describe. You will be told what your opponent picked for their offensive tactic to attack the planet or <prosody volume="loud">your</prosody> ship. Then you will get a choice between two defensive tactics which respond either to the opponent\'s offense or to ongoing combat on the planet or your ship. Once all these choices have been made, all deployed tactics as well as tactics which survived previous rounds attack each other. You win if you have 2 undefended attacks on either the opponent\'s ship or the planet.</prosody> <break strength="x-strong" /> Do you want to play?';
     this.emit(':ask', message, 'Do you want to play?');
   },
   'AMAZON.StopIntent': function StopIntent() {
