@@ -4,6 +4,7 @@ deployment:
   appId: amzn1.ask.skill.13bc8151-99af-4413-8667-a7f206562bc1
 db:
   tableName: sensorsAreDownUsers
+# I think cards do not make sense as "config" and should just be in separate metadata yaml file
 cards:
   # cardId:
     # name: Readable name of card

@@ -206,8 +206,10 @@ const guessAttemptHandlers = {
       pickCardReprompt = `Please say ${choices}.`;
       this.emit(':ask', `${messageSoFar} ${pickCardMsg}`, pickCardReprompt);
     } else if (choiceNames.length > 1) {
+      // This 2 tactics part gets real repetitive. Consider removing or
+      // varying or only showing in the first round or something.
       pickCardMsg = `We currently have readied ${choiceNames.length} tactics for you to choose between. Would you like to deploy ${choices}?`;
-      pickCardReprompt = `Pick either ${choices}.`;
+      pickCardReprompt = `Please say either ${choices}, or describe.`;
       this.emit(':ask', `${messageSoFar} ${pickCardMsg}`, pickCardReprompt);
     } else {
       this.emit('PlayAutomatically', messageSoFar);
