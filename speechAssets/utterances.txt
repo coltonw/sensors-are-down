@@ -1,7 +1,3 @@
-NumberGuessIntent {number}
-NumberGuessIntent is it {number}
-NumberGuessIntent how about {number}
-NumberGuessIntent could it be {number}
 CardSelectIntent {card}
 CardSelectIntent I choose {card}
 CardSelectIntent deploy {card}

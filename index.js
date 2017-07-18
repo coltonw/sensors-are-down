@@ -7,7 +7,7 @@ const unstackSpeech = require('./lib/unstackSpeech');
 const strings = require('./strings/strings.yaml');
 
 const states = {
-  GUESSMODE: '_GUESSMODE', // User is trying to guess the number.
+  GAMEMODE: '_GAMEMODE', // User is playing the game.
   STARTMODE: '_STARTMODE', // Prompt the user to start or restart the game.
 };
 
@@ -18,7 +18,6 @@ const newSessionHandlers = {
       this.attributes.gameState = null;
     }
     this.handler.state = states.STARTMODE;
-    console.log(strings);
     this.emit(':ask', strings.welcome.output, strings.welcome.reprompt);
   },
   'AMAZON.StopIntent': function StopIntent() {
@@ -41,22 +40,29 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     this.emit('HowToPlayIntent');
   },
   'AMAZON.YesIntent': function YesIntent() {
-    this.attributes.guessNumber = Math.floor(Math.random() * 100);
-    this.handler.state = states.GUESSMODE;
+    this.handler.state = states.GAMEMODE;
     const store = engine.init(this.attributes.gameState);
     store.dispatch(engine.startGame());
     this.attributes.gameState = store.getState();
     console.log('Player deck:');
     console.log(JSON.stringify(store.getState().game.playerDeck));
-    this.emit('PickACard', '', store.getState().game.offenseCardChoices);
+    this.emit('PickACard', '', store.getState());
   },
   'AMAZON.NoIntent': function NoIntent() {
     console.log('NOINTENT');
     this.emit(':tell', strings.goodbye);
   },
   HowToPlayIntent() {
-    console.log(JSON.stringify(strings.howToPlay));
-    this.emit(':ask', strings.howToPlay, strings.welcome.reprompt);
+    console.log('HowToPlayIntent');
+    const speechObj = unstackSpeech([
+      strings.howToPlay,
+      '<break strength="x-strong" />',
+      {
+        output: strings.doYouWantToPlay,
+        reprompt: strings.welcome.reprompt,
+      },
+    ]);
+    this.emit(':ask', speechObj.output);
   },
   'AMAZON.StopIntent': function StopIntent() {
     console.log('STOPINTENT');
@@ -77,44 +83,16 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
   },
 });
 
-const getChoices = (state) => {
-  if (state.game.defenseCardChoices) {
-    return state.game.defenseCardChoices;
-  } else if (state.game.offenseCardChoices) {
-    return state.game.offenseCardChoices;
-  }
-  return null;
-};
-
-const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
+const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
   NewSession() {
     this.handler.state = '';
     this.emitWithState('NewSession'); // Equivalent to the Start Mode NewSession handler
-  },
-  NumberGuessIntent() {
-    const guessNum = parseInt(this.event.request.intent.slots.number.value, 10);
-    const targetNum = this.attributes.guessNumber;
-    console.log(`user guessed: ${guessNum}`);
-
-    if (guessNum > targetNum) {
-      this.emit('TooHigh', guessNum);
-    } else if (guessNum < targetNum) {
-      this.emit('TooLow', guessNum);
-    } else if (guessNum === targetNum) {
-      // With a callback, use the arrow function to preserve the correct 'this' context
-      this.emit('JustRight', () => {
-        this.emit(':ask', `${guessNum.toString()} is correct! Would you like to play a new game?`,
-                'Say yes to start a new game, or no to end the game.');
-      });
-    } else {
-      this.emit('NotANum');
-    }
   },
   // TODO: add intent for choosing not to defend
   CardSelectIntent() {
     const cardSelected = this.event.request.intent.slots.card.value.toLowerCase();
     const store = engine.init(this.attributes.gameState);
-    const choices = getChoices(store.getState());
+    const choices = speeches.getChoices(store.getState());
     const match = _.find(Object.keys(choices.playerCards), cardId => (
       choices.playerCards[cardId].name.toLowerCase() === cardSelected
     ));
@@ -131,13 +109,16 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
       this.emit('NotAValidCard', choices);
     } else {
       // TODO: real error handling
-      this.emit('NotANum');
+      const speechObj = unstackSpeech([
+        speeches.unknown,
+      ], store.getState());
+      this.emit(':ask', speechObj.output, speechObj.reprompt);
     }
   },
   DescribeIntent() {
     console.log('Describe intent');
     const store = engine.init(this.attributes.gameState);
-    const cardChoices = getChoices(store.getState());
+    const cardChoices = speeches.getChoices(store.getState());
     let messageSoFar = '';
     // TODO: also describe the opponent's offensive choice when defending
     const choiceDescs = _.map(
@@ -145,12 +126,17 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
       value => value.description);
     messageSoFar += [...choiceDescs, ''].join(' <break strength="x-strong" /> ');
 
-    this.emit('PickACard', messageSoFar, cardChoices);
+    this.emit('PickACard', messageSoFar, store.getState());
   },
   // TODO: add yes intent for when there is only one choice to deploy
   'AMAZON.HelpIntent': function HelpIntent() {
-    this.emit(':ask', 'I am thinking of a number between zero and one hundred, try to guess and I will tell you' +
-            ' if it is higher or lower.', 'Try saying a number.');
+    console.log('Help intent');
+    const store = engine.init(this.attributes.gameState);
+    const speechObj = unstackSpeech([
+      strings.howToPlay,
+      '<break strength="x-strong" />',
+    ], store.getState());
+    this.emit('PickACard', speechObj.output, store.getState());
   },
   'AMAZON.StopIntent': function StopIntent() {
     console.log('STOPINTENT');
@@ -166,20 +152,24 @@ const guessModeHandlers = Alexa.CreateStateHandler(states.GUESSMODE, {
   },
   Unhandled() {
     console.log('UNHANDLED');
-    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying a number.', 'Try saying a number.');
+    const store = engine.init(this.attributes.gameState);
+    const speechObj = unstackSpeech([
+      speeches.unknown,
+    ], store.getState());
+    this.emit(':ask', speechObj.output, speechObj.reprompt);
   },
 });
 
 // These handlers are not bound to a state
-const guessAttemptHandlers = {
+const statelessHandlers = {
   DescribeRecentState(messageSoFarArg, state) {
     const messageSoFar = unstackSpeech([
       messageSoFarArg,
       speeches.describeRecentState(state),
     ], state);
-    const newChoices = getChoices(state);
+    const newChoices = speeches.getChoices(state);
     if (newChoices) {
-      this.emit('PickACard', messageSoFar.output, newChoices);
+      this.emit('PickACard', messageSoFar.output, state);
     } else if (state.game.gameEndResults) {
       this.emit('EndOfGame', messageSoFar.output, state.game.gameEndResults);
     }
@@ -193,26 +183,22 @@ const guessAttemptHandlers = {
     // TODO: Better handle possible infinite loops
     this.emit('DescribeRecentState', messageSoFar, store.getState());
   },
-  PickACard(messageSoFar, cardChoices) {
+  PickACard(messageSoFar, state) {
+    // TODO: possibly convert this intent calling other intents to just a loop
+    // note that pcik a card is a bit of a misnomer.
+    // It does tell you to pick a card but it also will run the engine automatically
+    // if there is no card to play. This intent could almost be called "runEngine".
     console.log('Pick a card intent');
-    const choiceNames = _.map(
-      _.values(cardChoices.playerCards),
-      value => value.name);
-    const choices = choiceNames.join(', or ');
-    let pickCardMsg;
-    let pickCardReprompt;
-    if (choiceNames.length === 1) {
-      pickCardMsg = `We currently have readied ${choices}. Please say ${choices} to deploy them.`;
-      pickCardReprompt = `Please say ${choices}.`;
-      this.emit(':ask', `${messageSoFar} ${pickCardMsg}`, pickCardReprompt);
-    } else if (choiceNames.length > 1) {
-      // This 2 tactics part gets real repetitive. Consider removing or
-      // varying or only showing in the first round or something.
-      pickCardMsg = `We currently have readied ${choiceNames.length} tactics for you to choose between. Would you like to deploy ${choices}?`;
-      pickCardReprompt = `Please say either ${choices}, or describe.`;
-      this.emit(':ask', `${messageSoFar} ${pickCardMsg}`, pickCardReprompt);
-    } else {
+    const cardChoices = speeches.getChoices(state);
+    const noChoices = Object.keys(cardChoices.playerCards).length === 0;
+    if (noChoices) {
       this.emit('PlayAutomatically', messageSoFar);
+    } else {
+      const speechObj = unstackSpeech([
+        messageSoFar,
+        speeches.pickACard(state),
+      ], state);
+      this.emit(':ask', speechObj.output, speechObj.reprompt);
     }
   },
   EndOfGame(messageSoFar, gameEndResults) {
@@ -245,7 +231,6 @@ const guessAttemptHandlers = {
     } else if (gameEndResults.drawStalemate) {
       gameResultMsg = 'Huh, looks like we both ran out of steam. Today may be a draw but we will be back to take this planet!';
     }
-    console.log(`${messageSoFar} ${gameResultMsg} ${playAgainMsg}`);
     this.emit(':ask', `${messageSoFar} ${gameResultMsg} ${playAgainMsg}`);
   },
   NotAValidCard(cardChoices) {
@@ -255,20 +240,6 @@ const guessAttemptHandlers = {
     const choices = choiceNames.join(' or saying deploy ');
     this.emit(':ask', `Sorry, I didn't get that. Try saying deploy ${choices}.`, `Try saying deploy ${choices}.`);
   },
-  TooHigh(val) {
-    this.emit(':ask', `${val.toString()} is too high.`, 'Try saying a smaller number.');
-  },
-  TooLow(val) {
-    this.emit(':ask', `${val.toString()} is too low.`, 'Try saying a larger number.');
-  },
-  JustRight(callback) {
-    this.handler.state = states.STARTMODE;
-    this.attributes.gamesPlayed += 1;
-    callback();
-  },
-  NotANum() {
-    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying a number.', 'Try saying a number.');
-  },
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -277,8 +248,8 @@ exports.handler = function handler(event, context, callback) {
   alexa.appId = config.deployment.appId;
   alexa.dynamoDBTableName = config.db.tableName;
   alexa.registerHandlers(newSessionHandlers,
-    guessModeHandlers,
+    gameModeHandlers,
     startGameHandlers,
-    guessAttemptHandlers);
+    statelessHandlers);
   alexa.execute();
 };
