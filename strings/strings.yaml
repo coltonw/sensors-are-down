@@ -15,3 +15,24 @@ howToPlay: >-
     <break strength="strong" />
     There are 3 combat zones': your ship, the opponent's ship, and the planet you are both fighting over. Every round you will get a choice between two offensive tactics. These tactics will attack either the planet or <prosody volume="loud">the opponent's</prosody> ship. You can get a description of the tactics by saying describe. You will be told what your opponent picked for their offensive tactic to attack the planet or <prosody volume="loud">your</prosody> ship. Then you will get a choice between two defensive tactics which respond either to the opponent's offense or to ongoing combat on the planet or your ship. Once all these choices have been made, all deployed tactics as well as tactics which survived previous rounds attack each other. You win if you have 2 undefended attacks on either the opponent's ship or the planet.
   </prosody>
+gameEnd:
+  shipDefeat: >-
+    <say-as interpret-as="interjection">Great scott!</say-as> The ship has been irreversably damaged! We are going down!
+    <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />
+  shipVictory: Good job! We have detroyed the enemy ship!
+  planetVictory: Victory is ours! We have taken control of the planet!
+  planetDefeat: We have lost the planet to the enemy. We must retreat before they set up planet to orbit missile barrage!
+  tiebreakerVictory: >-
+    The ship is going down but it looks like we took them out too and have taken the planet. Our sacrifice will not be in vain!
+    <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />
+  tiebreakerDefeat: >-
+    Both ours and the enemy's ship is going down, but it looks like they are taking the planet. <say-as interpret-as="interjection">Phooey!</say-as>
+    <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />
+  drawShipsDestroyed: >-
+    Looks like no one gets the planet today, both ours and the enemy's ship are going down!
+    <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />
+  drawStalemate: Huh, looks like we both ran out of steam. Today may be a draw but we will be back to take this planet!
+  unknown: Unexpected game result.
+invalidCard:
+  outputTemplate: Sorry, I didn't get that. Try saying deploy ${choices.join(', or saying deploy ')}.
+  repromptTemplate: Try saying deploy ${choices.join(', or saying deploy ')}.

@@ -62,7 +62,7 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
         reprompt: strings.welcome.reprompt,
       },
     ]);
-    this.emit(':ask', speechObj.output);
+    this.emit(':ask', speechObj.output, speechObj.reprompt);
   },
   'AMAZON.StopIntent': function StopIntent() {
     console.log('STOPINTENT');
@@ -106,7 +106,7 @@ const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
       this.attributes.gameState = store.getState();
       this.emit('DescribeRecentState', '', store.getState());
     } else if (choices && Object.keys(choices.playerCards).length > 0) {
-      this.emit('NotAValidCard', choices);
+      this.emit('NotAValidCard', store.getState());
     } else {
       // TODO: real error handling
       const speechObj = unstackSpeech([
@@ -171,7 +171,7 @@ const statelessHandlers = {
     if (newChoices) {
       this.emit('PickACard', messageSoFar.output, state);
     } else if (state.game.gameEndResults) {
-      this.emit('EndOfGame', messageSoFar.output, state.game.gameEndResults);
+      this.emit('EndOfGame', messageSoFar.output, state);
     }
   },
   PlayAutomatically(messageSoFar) {
@@ -201,44 +201,20 @@ const statelessHandlers = {
       this.emit(':ask', speechObj.output, speechObj.reprompt);
     }
   },
-  EndOfGame(messageSoFar, gameEndResults) {
+  EndOfGame(messageSoFar, state) {
     console.log('End of game intent');
-    console.log(JSON.stringify(gameEndResults));
+    console.log(JSON.stringify(state.game.gameEndResults));
     this.handler.state = states.STARTMODE;
     this.attributes.gamesPlayed += 1;
-    const playAgainMsg = 'Thank you for playing! Would you like to play again?';
-    let gameResultMsg = 'Unexpected game result.';
-    console.log('game results');
-    console.log(JSON.stringify(gameEndResults));
-    if (gameEndResults.playerShipDefeat) {
-      gameResultMsg = `<say-as interpret-as="interjection">Great scott!</say-as> The ship has been irreversably damaged! We are going down!
-          <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;
-    } else if (gameEndResults.playerShipVictory) {
-      gameResultMsg = 'Good job! We have detroyed the enemy ship!';
-    } else if (gameEndResults.playerPlanetVictory) {
-      gameResultMsg = 'Victory is ours! We have taken control of the planet!';
-    } else if (gameEndResults.playerPlanetDefeat) {
-      gameResultMsg = 'We have lost the planet to the enemy. We must retreat before they set up planet to orbit missile barrage!';
-    } else if (gameEndResults.playerTiebreakerVictory) {
-      gameResultMsg = `The ship is going down but it looks like we took them out too and have taken the planet. Our sacrifice will not be in vain!
-          <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;
-    } else if (gameEndResults.playerTiebreakerDefeat) {
-      gameResultMsg = `Both ours and the enemy's ship is going down, but it looks like they are taking the planet. <say-as interpret-as="interjection">Phooey!</say-as>
-          <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;
-    } else if (gameEndResults.drawShipsDestroyed) {
-      gameResultMsg = `Looks like no one gets the planet today, both ours and the enemy's ship are going down!
-          <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />`;
-    } else if (gameEndResults.drawStalemate) {
-      gameResultMsg = 'Huh, looks like we both ran out of steam. Today may be a draw but we will be back to take this planet!';
-    }
-    this.emit(':ask', `${messageSoFar} ${gameResultMsg} ${playAgainMsg}`);
+    const speechObj = unstackSpeech([
+      messageSoFar,
+      speeches.endOfGame(state),
+    ], state);
+    this.emit(':ask', speechObj.output, speechObj.reprompt);
   },
-  NotAValidCard(cardChoices) {
-    const choiceNames = _.map(
-      _.values(cardChoices.playerCards),
-      value => value.name);
-    const choices = choiceNames.join(' or saying deploy ');
-    this.emit(':ask', `Sorry, I didn't get that. Try saying deploy ${choices}.`, `Try saying deploy ${choices}.`);
+  NotAValidCard(state) {
+    const speechObj = unstackSpeech(speeches.invalidCard, state);
+    this.emit(':ask', speechObj.output, speechObj.reprompt);
   },
 };
 
