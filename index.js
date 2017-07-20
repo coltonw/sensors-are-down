@@ -46,7 +46,7 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     this.attributes.gameState = store.getState();
     console.log('Player deck:');
     console.log(JSON.stringify(store.getState().game.playerDeck));
-    this.emit('PickACard', '', store.getState());
+    this.emit('RunGame');
   },
   'AMAZON.NoIntent': function NoIntent() {
     console.log('NOINTENT');
@@ -92,28 +92,16 @@ const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
   CardSelectIntent() {
     const cardSelected = this.event.request.intent.slots.card.value.toLowerCase();
     const store = engine.init(this.attributes.gameState);
-    const choices = speeches.getChoices(store.getState());
-    const match = _.find(Object.keys(choices.playerCards), cardId => (
-      choices.playerCards[cardId].name.toLowerCase() === cardSelected
-    ));
-    console.log(`Card picked: ${match}`);
-    if (match && choices) {
-      if (store.getState().game.defenseCardChoices) {
-        store.dispatch(engine.pickDefenseCard(match));
-      } else {
-        store.dispatch(engine.pickOffenseCard(match));
-      }
-      this.attributes.gameState = store.getState();
-      this.emit('DescribeRecentState', '', store.getState());
-    } else if (choices && Object.keys(choices.playerCards).length > 0) {
-      this.emit('NotAValidCard', store.getState());
-    } else {
-      // TODO: real error handling
-      const speechObj = unstackSpeech([
-        speeches.unknown,
-      ], store.getState());
-      this.emit(':ask', speechObj.output, speechObj.reprompt);
+    const speechObj = engine.selectCard(cardSelected);
+
+    // update session info based on engine changes
+    this.attributes.gameState = store.getState();
+    if (store.getState().game.gameEndResults) {
+      this.handler.state = states.STARTMODE;
+      this.attributes.gamesPlayed += 1;
     }
+
+    this.emit(':ask', speechObj.output, speechObj.reprompt);
   },
   DescribeIntent() {
     console.log('Describe intent');
@@ -126,7 +114,7 @@ const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
       value => value.description);
     messageSoFar += [...choiceDescs, ''].join(' <break strength="x-strong" /> ');
 
-    this.emit('PickACard', messageSoFar, store.getState());
+    this.emit('RunGame', messageSoFar);
   },
   // TODO: add yes intent for when there is only one choice to deploy
   'AMAZON.HelpIntent': function HelpIntent() {
@@ -136,7 +124,7 @@ const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
       strings.howToPlay,
       '<break strength="x-strong" />',
     ], store.getState());
-    this.emit('PickACard', speechObj.output, store.getState());
+    this.emit('RunGame', speechObj.output);
   },
   'AMAZON.StopIntent': function StopIntent() {
     console.log('STOPINTENT');
@@ -144,6 +132,7 @@ const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
   },
   'AMAZON.CancelIntent': function CancelIntent() {
     console.log('CANCELINTENT');
+    this.emit(':tell', strings.goodbye);
   },
   SessionEndedRequest() {
     console.log('SESSIONENDEDREQUEST');
@@ -162,58 +151,17 @@ const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
 
 // These handlers are not bound to a state
 const statelessHandlers = {
-  DescribeRecentState(messageSoFarArg, state) {
-    const messageSoFar = unstackSpeech([
-      messageSoFarArg,
-      speeches.describeRecentState(state),
-    ], state);
-    const newChoices = speeches.getChoices(state);
-    if (newChoices) {
-      this.emit('PickACard', messageSoFar.output, state);
-    } else if (state.game.gameEndResults) {
-      this.emit('EndOfGame', messageSoFar.output, state);
-    }
-  },
-  PlayAutomatically(messageSoFar) {
-    console.log('Playing automatically');
+  RunGame(messageSoFar) {
     const store = engine.init(this.attributes.gameState);
-    store.dispatch(engine.continueWithoutSelection());
+    const speechObj = engine.run(messageSoFar);
+
+    // update session info based on engine changes
     this.attributes.gameState = store.getState();
-    // This can easilly lead to an infinite loop if we are in a degenerate state
-    // TODO: Better handle possible infinite loops
-    this.emit('DescribeRecentState', messageSoFar, store.getState());
-  },
-  PickACard(messageSoFar, state) {
-    // TODO: possibly convert this intent calling other intents to just a loop
-    // note that pcik a card is a bit of a misnomer.
-    // It does tell you to pick a card but it also will run the engine automatically
-    // if there is no card to play. This intent could almost be called "runEngine".
-    console.log('Pick a card intent');
-    const cardChoices = speeches.getChoices(state);
-    const noChoices = Object.keys(cardChoices.playerCards).length === 0;
-    if (noChoices) {
-      this.emit('PlayAutomatically', messageSoFar);
-    } else {
-      const speechObj = unstackSpeech([
-        messageSoFar,
-        speeches.pickACard(state),
-      ], state);
-      this.emit(':ask', speechObj.output, speechObj.reprompt);
+    if (store.getState().game.gameEndResults) {
+      this.handler.state = states.STARTMODE;
+      this.attributes.gamesPlayed += 1;
     }
-  },
-  EndOfGame(messageSoFar, state) {
-    console.log('End of game intent');
-    console.log(JSON.stringify(state.game.gameEndResults));
-    this.handler.state = states.STARTMODE;
-    this.attributes.gamesPlayed += 1;
-    const speechObj = unstackSpeech([
-      messageSoFar,
-      speeches.endOfGame(state),
-    ], state);
-    this.emit(':ask', speechObj.output, speechObj.reprompt);
-  },
-  NotAValidCard(state) {
-    const speechObj = unstackSpeech(speeches.invalidCard, state);
+
     this.emit(':ask', speechObj.output, speechObj.reprompt);
   },
 };

@@ -1,6 +1,6 @@
 ---
 # The advantages of putting strings in here are one centralized string location and easier string readability and editablity.
-# the disadvanatage is that this needs a custom loader and so it won't work in mocha
+# the disadvantage is that this needs a custom loader and so it won't work in mocha
 welcome:
   output: >-
     Welcome to sensors are down, a space combat game.
@@ -19,7 +19,7 @@ gameEnd:
   shipDefeat: >-
     <say-as interpret-as="interjection">Great scott!</say-as> The ship has been irreversably damaged! We are going down!
     <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />
-  shipVictory: Good job! We have detroyed the enemy ship!
+  shipVictory: Good job! We have destroyed the enemy ship!
   planetVictory: Victory is ours! We have taken control of the planet!
   planetDefeat: We have lost the planet to the enemy. We must retreat before they set up planet to orbit missile barrage!
   tiebreakerVictory: >-
