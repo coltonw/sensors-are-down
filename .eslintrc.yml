@@ -25,4 +25,5 @@
     import/no-extraneous-dependencies:
       - error
       - devDependencies:
-        - "simulate.js"
+        - simulate.js
+        - webpack.config.js

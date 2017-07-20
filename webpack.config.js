@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const config = require('config');
 const rimraf = require('rimraf');
+const webpack = require('webpack');
 const BabiliPlugin = require('babili-webpack-plugin');
 
 // This will take the config based on the current NODE_ENV and save it to 'build/client.json'
@@ -19,6 +20,9 @@ module.exports = {
   ],
   plugins: [
     new BabiliPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    }),
   ],
   resolve: {
     alias: {
@@ -31,6 +35,14 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
+      },
+      {
+        test: /\.ya?ml$/,
+        exclude: /node_modules/,
+        use: [
+          'json-loader',
+          'yaml-loader',
+        ],
       },
     ],
   },

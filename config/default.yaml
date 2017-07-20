@@ -4,6 +4,7 @@ deployment:
   appId: amzn1.ask.skill.13bc8151-99af-4413-8667-a7f206562bc1
 db:
   tableName: sensorsAreDownUsers
+# I think cards do not make sense as "config" and should just be in separate metadata yaml file
 cards:
   # cardId:
     # name: Readable name of card
@@ -19,7 +20,7 @@ cards:
     # count: number of times card is can be used before card is removed from deck (defaults to 1)
   relentlessSwarm:
     name: Relentless Swarm
-    description: Relentless Swarm are weak ships but we are stocked with 5 rounds of them
+    description: Relentless Swarm are weak ships but we are stocked with 4 rounds of them
     strength: 2
     offense: true
     defense: true
@@ -42,13 +43,13 @@ cards:
   planetaryBombers:
     name: Planetary Bombers
     description: When the planet seems lost, the Planetary Bombers will destroy everything on it
-    special: 'preplaycards'
+    special: 'precombat'
     strength: 1
     defense: true
     planet: true
   tankBattalion:
     name: Tank Battalion
-    description: The Tank Battalion is boring in its consistency
+    description: The Tank Battalion is consistent planet battler
     strength: 3
     offense: true
     defense: true
