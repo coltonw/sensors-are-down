@@ -20,12 +20,12 @@ cards:
     # count: number of times card is can be used before card is removed from deck (defaults to 1)
   relentlessSwarm:
     name: Relentless Swarm
-    description: Relentless Swarm are weak ships but we are stocked with 4 rounds of them
+    description: Relentless Swarm are weak ships but we are stocked with 3 rounds of them
     strength: 2
     offense: true
     defense: true
     space: true
-    count: 4
+    count: 3
   ionTurrets:
     name: Ion Turrets
     description: Ion Turrets are tough. Hopefully they will hold
@@ -54,7 +54,7 @@ cards:
     offense: true
     defense: true
     planet: true
-    count: 3
+    count: 2
   groundTroops:
     name: Ground Troops
     description: Ground Troops are pretty much worthless. But we throw'em down there just to disrupt things.
@@ -63,7 +63,7 @@ cards:
     offense: true
     defense: true
     planet: true
-    count: 4
+    count: 3
   scrapHarvesters:
     name: Scrap Harvesters
     description: Our Scrap Harvesters fly in and can upgrade themselves with scrap from a defeated enemy
@@ -75,9 +75,17 @@ cards:
   nanightStorm:
     name: Nanight Storm
     description: The Nanight Storm descends on the planet like a cloud then comes back to partially re-energize before attacking again
-    strength: 5
+    strength: 4
     special: 'preplaycards'
     offense: true
     defense: true
     planet: true
     count: 2
+  reanimatingSlivers:
+    name: Reanimating Sliver Ships
+    description: These ships will reanimate on first death and continue fighting
+    strength: 3
+    special: 'postcombat'
+    offense: true
+    defense: true
+    space: true

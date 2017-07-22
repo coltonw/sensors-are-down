@@ -88,7 +88,10 @@ describe('engine', () => {
       ...store.getState().game.ships.playerShip.playerCards,
       ...store.getState().game.ships.aiShip.playerCards];
     assert.equal(allPlayerCardsInPlay.length, 1, 'there should be only one player card in play');
-    assert.deepEqual(allPlayerCardsInPlay, [_.assign({}, firstCard, { cardId: firstCardId })], 'the card played should be in play');
+    assert.deepEqual(
+      [{ ...allPlayerCardsInPlay[0], cardUid: null }],
+      [_.assign({}, firstCard, { cardId: firstCardId, cardUid: null })],
+      'the card played should be in play');
 
     const firstCardRemainingCount = store.getState().game.playerDeck[firstCardId] ?
         store.getState().game.playerDeck[firstCardId].count : 0;
