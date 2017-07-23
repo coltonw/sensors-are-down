@@ -97,3 +97,4 @@ cards:
     offense: true
     defense: true
     planet: true
+    count: 3
