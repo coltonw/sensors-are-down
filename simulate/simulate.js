@@ -6,6 +6,7 @@ const path = require('path');
 const engine = require('../lib/engine');
 
 function runSingleGame(store) {
+  let loops = 0;
   while (!store.getState().game.gameEndResults) {
     if (store.getState().game.defenseCardChoices) {
       const defensePick =
@@ -25,6 +26,11 @@ function runSingleGame(store) {
       }
     } else if (store.getState().game.error) {
       throw new Error(store.getState().game.error);
+    }
+    loops += 1;
+    if (loops > 400) {
+      console.dir(store.getState(), { depth: 5 });
+      throw new Error('Infinite loop!');
     }
   }
   return store;
