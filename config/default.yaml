@@ -43,13 +43,13 @@ cards:
   planetaryBombers:
     name: Planetary Bombers
     description: When the planet seems lost, the Planetary Bombers will destroy everything on it
-    special: 'precombat'
+    special: precombat
     strength: 1
     defense: true
     planet: true
   tankBattalion:
     name: Tank Battalion
-    description: The Tank Battalion is consistent planet battler
+    description: The Tank Battalion is a consistent planet battler
     strength: 3
     offense: true
     defense: true
@@ -67,7 +67,7 @@ cards:
   scrapHarvesters:
     name: Scrap Harvesters
     description: Our Scrap Harvesters fly in and can upgrade themselves with scrap from a defeated enemy
-    special: 'postcombat'
+    special: postcombat
     strength: 3
     offense: true
     space: true
@@ -76,16 +76,24 @@ cards:
     name: Nanight Storm
     description: The Nanight Storm descends on the planet like a cloud then comes back to partially re-energize before attacking again
     strength: 4
-    special: 'preplaycards'
+    special: preplaycards
     offense: true
     defense: true
     planet: true
     count: 2
   reanimatingSlivers:
     name: Reanimating Sliver Ships
-    description: These ships will reanimate on first death and continue fighting
+    description: The Reanimating Sliver Ships will reanimate on first death and continue fighting
     strength: 3
-    special: 'postcombat'
+    special: postcombat
     offense: true
     defense: true
     space: true
+  trenchFighters:
+    name: Trench Fighters
+    description: Our Trench Fighters are extra difficult to destroy if we have taken hold of the planet
+    strength: 2
+    special: strength
+    offense: true
+    defense: true
+    planet: true
