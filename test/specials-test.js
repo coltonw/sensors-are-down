@@ -131,4 +131,35 @@ describe('specials', () => {
     assert.deepEqual(newState.ships.playerShip.playerCards,
       postCombatState.ships.playerShip.playerCards);
   });
+  it('should run planetaryBombers properly', () => {
+    const state = {
+      defenseCardChoices: {
+        playerCards: {
+          defender: {},
+        },
+        aiCards: {
+          planetaryBombers: { special: 'precombat' },
+        },
+      },
+      ships: {
+        playerShip: {
+          playerCards: [],
+          aiCards: [],
+        },
+        aiShip: {
+          playerCards: [],
+          aiCards: [],
+        },
+      },
+      planet: {
+        playerCards: [{ cardId: 'youAboutToDie', strength: 100 }, { cardId: 'dead', strength: 5 }, { cardId: 'defender', strength: 3 }],
+        aiCards: [{ cardId: 'alsoAboutToDie' }, { cardId: 'planetaryBombers', strength: 1, special: 'precombat' }],
+      },
+    };
+    const newState = playSpecials('precombat', state);
+    assert.equal(newState.planet.playerCards.length, 1);
+    assert.equal(newState.planet.playerCards[0], state.planet.playerCards[2]);
+    assert.equal(newState.planet.aiCards.length, 1);
+    assert.equal(newState.planet.aiCards[0], state.planet.aiCards[1]);
+  });
 });
