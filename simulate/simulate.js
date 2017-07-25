@@ -1,7 +1,8 @@
 require('babel-register');
 const _ = require('lodash');
-const yaml = require('js-yaml');
+const config = require('config');
 const fs = require('fs');
+const jsYaml = require('js-yaml');
 const path = require('path');
 const engine = require('../lib/engine');
 
@@ -74,19 +75,23 @@ function saveStats(stats) {
   stats.totalOverview = aggregateResults(stats.total);
   // eslint-disable-next-line no-param-reassign
   stats.cardOverview = _.mapValues(stats.cards, aggregateResults);
-  fs.writeFileSync(path.resolve(__dirname, 'results.yml'), yaml.dump(stats));
+  fs.writeFileSync(path.resolve(__dirname, 'results.yml'), jsYaml.dump(stats));
 }
 
 function simulateGames() {
   const numGames = parseInt(process.argv[2], 10) || 200;
   console.log(`Simulating ${numGames} games`);
+  const includeCards = _.intersection(process.argv.slice(3), Object.keys(config.cards));
+  if (includeCards.length > 0) {
+    console.log(`including ${includeCards.join(' and ')} in all player decks`);
+  }
   let stats = {
     total: {},
     cards: {},
   };
   for (let i = 0; i < numGames; i += 1) {
     const store = engine.init();
-    store.dispatch(engine.startGame());
+    store.dispatch(engine.startGame(includeCards));
     const startState = store.getState();
     runSingleGame(store);
     const endState = store.getState();

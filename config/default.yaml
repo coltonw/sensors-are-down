@@ -98,3 +98,12 @@ cards:
     defense: true
     planet: true
     count: 3
+  puffingPlant:
+    name: Puffing Plant
+    description: The Puffing Plant gets stronger the more opponents it is facing
+    strength: 3
+    special: strength
+    offense: true
+    defense: true
+    planet: true
+    tribe: plant
