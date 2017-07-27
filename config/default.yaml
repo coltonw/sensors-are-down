@@ -33,6 +33,7 @@ cards:
     shieldStrength: 1
     defense: true
     space: true
+    tribe: turret
   assaultFrigates:
     name: Assault Frigates
     description: Assault Frigates are our strongest ships for space combat
@@ -107,3 +108,10 @@ cards:
     defense: true
     planet: true
     tribe: plant
+  shieldBurst:
+    name: Shield Burst
+    description: The Shield Burst is a pure ship defense card that blocks all damage on the ship 4 times
+    strength: 0
+    defense: true
+    space: true
+    count: 4

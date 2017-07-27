@@ -6,6 +6,15 @@ const jsYaml = require('js-yaml');
 const path = require('path');
 const engine = require('../lib/engine');
 
+function sortObj(obj) {
+  const keys = Object.keys(obj);
+  keys.sort();
+  return keys.reduce(
+    (acc, key) =>
+      _.assign({}, acc, { [key]: obj[key] }),
+    {});
+}
+
 function runSingleGame(store) {
   let loops = 0;
   while (!store.getState().game.gameEndResults) {
@@ -74,7 +83,9 @@ function saveStats(stats) {
   // eslint-disable-next-line no-param-reassign
   stats.totalOverview = aggregateResults(stats.total);
   // eslint-disable-next-line no-param-reassign
-  stats.cardOverview = _.mapValues(stats.cards, aggregateResults);
+  stats.cards = sortObj(stats.cards);
+  // eslint-disable-next-line no-param-reassign
+  stats.cardOverview = sortObj(_.mapValues(stats.cards, aggregateResults));
   fs.writeFileSync(path.resolve(__dirname, 'results.yml'), jsYaml.dump(stats));
 }
 
