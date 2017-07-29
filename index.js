@@ -59,15 +59,12 @@ const baseStartModeHandlers = {
   },
   HowToPlayIntent() {
     this.handler.state = states.STARTMODE;
-    const reprompt = (this.attributes.gamesPlayed === 0 ?
-        strings.welcome.firstTimeReprompt :
-        strings.welcome.reprompt);
     const speechObj = unstackSpeech([
       strings.howToPlay,
       '<break strength="x-strong" />',
       {
         output: strings.doYouWantToPlay,
-        reprompt,
+        reprompt: strings.welcome.reprompt,
       },
     ]);
     this.emit(':ask', speechObj.output, speechObj.reprompt);
