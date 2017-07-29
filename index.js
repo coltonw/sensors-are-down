@@ -8,6 +8,7 @@ const strings = require('./strings/strings.yaml');
 
 const states = {
   GAMEMODE: '_GAMEMODE', // User is playing the game.
+  FIRSTSTARTMODE: '_FIRSTSTARTMODE', // Prompt the user to learn to play or start the game.
   STARTMODE: '_STARTMODE', // Prompt the user to start or restart the game.
 };
 
@@ -17,8 +18,15 @@ const newSessionHandlers = {
       this.attributes.gamesPlayed = 0;
       this.attributes.gameState = null;
     }
-    this.handler.state = states.STARTMODE;
-    this.emit(':ask', strings.welcome.output, strings.welcome.reprompt);
+    if (this.attributes.gamesPlayed === 0) {
+      this.handler.state = states.FIRSTSTARTMODE;
+      this.emit(':ask', `${strings.welcome.output} ${strings.welcome.firstTimePrompt}`,
+          strings.welcome.firstTimeReprompt);
+    } else {
+      this.handler.state = states.STARTMODE;
+      this.emit(':ask', `${strings.welcome.output} ${strings.welcome.prompt}`,
+          strings.welcome.reprompt);
+    }
   },
   'AMAZON.StopIntent': function StopIntent() {
     this.emit(':tell', strings.goodbye);
@@ -32,34 +40,34 @@ const newSessionHandlers = {
   },
 };
 
-const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
+const doRunGame = () => {
+  this.handler.state = states.GAMEMODE;
+  const store = engine.init(this.attributes.gameState);
+  store.dispatch(engine.startGame());
+  this.attributes.gameState = store.getState();
+  console.log('Player deck:');
+  console.log(JSON.stringify(store.getState().game.playerDeck));
+  this.emit('RunGame');
+};
+
+const baseStartModeHandlers = {
   NewSession() {
     this.emit('NewSession'); // Uses the handler in newSessionHandlers
   },
   'AMAZON.HelpIntent': function HelpIntent() {
     this.emit('HowToPlayIntent');
   },
-  'AMAZON.YesIntent': function YesIntent() {
-    this.handler.state = states.GAMEMODE;
-    const store = engine.init(this.attributes.gameState);
-    store.dispatch(engine.startGame());
-    this.attributes.gameState = store.getState();
-    console.log('Player deck:');
-    console.log(JSON.stringify(store.getState().game.playerDeck));
-    this.emit('RunGame');
-  },
-  'AMAZON.NoIntent': function NoIntent() {
-    console.log('NOINTENT');
-    this.emit(':tell', strings.goodbye);
-  },
   HowToPlayIntent() {
-    console.log('HowToPlayIntent');
+    this.handler.state = states.STARTMODE;
+    const reprompt = (this.attributes.gamesPlayed === 0 ?
+        strings.welcome.firstTimeReprompt :
+        strings.welcome.reprompt);
     const speechObj = unstackSpeech([
       strings.howToPlay,
       '<break strength="x-strong" />',
       {
         output: strings.doYouWantToPlay,
-        reprompt: strings.welcome.reprompt,
+        reprompt,
       },
     ]);
     this.emit(':ask', speechObj.output, speechObj.reprompt);
@@ -80,6 +88,30 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
     console.log('UNHANDLED');
     const message = 'Say yes to continue, or no to end the game.';
     this.emit(':ask', message, message);
+  },
+};
+
+const firstTimeStartGameHandlers = Alexa.CreateStateHandler(states.FIRSTSTARTMODE, {
+  ...baseStartModeHandlers,
+  'AMAZON.YesIntent': function YesIntent() {
+    // Would you like to hear how to play? Yes.
+    this.emit('HowToPlayIntent');
+  },
+  'AMAZON.NoIntent': function NoIntent() {
+    // Would you like to hear how to play? No.
+    doRunGame();
+  },
+});
+
+const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
+  ...baseStartModeHandlers,
+  'AMAZON.YesIntent': function YesIntent() {
+    // Would you like to play? Yes.
+    doRunGame();
+  },
+  'AMAZON.NoIntent': function NoIntent() {
+    // Would you like to play? No.
+    this.emit(':tell', strings.goodbye);
   },
 });
 
@@ -173,6 +205,7 @@ exports.handler = function handler(event, context, callback) {
   alexa.dynamoDBTableName = config.db.tableName;
   alexa.registerHandlers(newSessionHandlers,
     gameModeHandlers,
+    firstTimeStartGameHandlers,
     startGameHandlers,
     statelessHandlers);
   alexa.execute();
