@@ -13,7 +13,6 @@ goodbye: Goodbye!
 doYouWantToPlay: Do you want to play?
 howToPlay: >-
   <prosody rate="90%">
-    Welcome to Sensors are Down.
     You are a starship captain engaging in ship-to-ship combat with hostile forces while in orbit around a contested planet.
     The goal of the game is to destroy your opponent's ship or to take over the planet.
     <break strength="strong" />
