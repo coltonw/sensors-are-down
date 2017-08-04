@@ -4,7 +4,7 @@ const _ = require('lodash');
 const engine = require('./lib/engine');
 const speeches = require('./lib/speeches');
 const unstackSpeech = require('./lib/unstackSpeech');
-const strings = require('./strings/strings.yaml');
+const strings = require('./data/strings.yaml');
 
 const states = {
   GAMEMODE: '_GAMEMODE', // User is playing the game.

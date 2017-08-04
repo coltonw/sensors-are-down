@@ -1,9 +1,9 @@
 require('babel-register');
 const _ = require('lodash');
-const config = require('config');
 const fs = require('fs');
 const jsYaml = require('js-yaml');
 const path = require('path');
+const allCards = require('../loaders/cards');
 const engine = require('../lib/engine');
 
 function sortObj(obj) {
@@ -92,7 +92,7 @@ function saveStats(stats) {
 function simulateGames() {
   const numGames = parseInt(process.argv[2], 10) || 200;
   console.log(`Simulating ${numGames} games`);
-  const includeCards = _.intersection(process.argv.slice(3), Object.keys(config.cards));
+  const includeCards = _.intersection(process.argv.slice(3), Object.keys(allCards));
   if (includeCards.length > 0) {
     console.log(`including ${includeCards.join(' and ')} in all player decks`);
   }
