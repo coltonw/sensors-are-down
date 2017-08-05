@@ -168,7 +168,7 @@ const statelessHandlers = {
 
 // eslint-disable-next-line no-unused-vars
 exports.handler = function handler(event, context, callback) {
-  const alexa = Alexa.handler(event, context);
+  const alexa = Alexa.handler(event, context, callback);
   alexa.appId = config.deployment.appId;
   alexa.dynamoDBTableName = config.db.tableName;
   alexa.registerHandlers(newSessionHandlers,
