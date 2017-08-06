@@ -53,10 +53,17 @@ function addGameEndResults(gerA = {}, gerB = {}) {
 
 function recordStats(startState, endState, stats) {
   const cardComboIds = [];
+  const matchupIds = [];
   const cardIds = Object.keys(startState.game.playerDeck).sort();
   for (let i = 0; i < cardIds.length - 1; i += 1) {
     for (let j = i + 1; j < cardIds.length; j += 1) {
       cardComboIds.push(`${cardIds[i]}-${cardIds[j]}`);
+    }
+  }
+  const aiCardIds = Object.keys(startState.game.aiDeck).sort();
+  for (let i = 0; i < cardIds.length; i += 1) {
+    for (let j = 0; j < aiCardIds.length; j += 1) {
+      matchupIds.push(`${cardIds[i]}-vs-${aiCardIds[j]}`);
     }
   }
   return _.assign({}, stats, {
@@ -68,6 +75,11 @@ function recordStats(startState, endState, stats) {
         [comboId]: addGameEndResults(stats.cardCombos[comboId], endState.game.gameEndResults),
       }),
       stats.cardCombos),
+    matchups: _.reduce(matchupIds,
+      (acc, matchupId) => _.assign({}, acc, {
+        [matchupId]: addGameEndResults(stats.matchups[matchupId], endState.game.gameEndResults),
+      }),
+      stats.matchups),
   });
 }
 
@@ -97,12 +109,15 @@ function saveStats(statsArg) {
   stats.cards = sortObj(stats.cards);
   stats.cardOverview = sortObj(_.mapValues(stats.cards, aggregateResults));
   const cardComboOverview = sortObj(_.mapValues(stats.cardCombos, aggregateResults));
+  const matchupsOverview = sortObj(_.mapValues(stats.matchups, aggregateResults));
   // The overviews are way more interesting than these numbers
   delete stats.total;
   delete stats.cards;
   delete stats.cardCombos;
+  delete stats.matchups;
   fs.writeFileSync(path.resolve(__dirname, 'results.yml'), jsYaml.dump(stats));
   fs.writeFileSync(path.resolve(__dirname, 'resultsCombos.yml'), jsYaml.dump(cardComboOverview));
+  fs.writeFileSync(path.resolve(__dirname, 'resultsMatchups.yml'), jsYaml.dump(matchupsOverview));
 }
 
 function simulateGames() {
@@ -116,6 +131,7 @@ function simulateGames() {
     total: {},
     cards: {},
     cardCombos: {},
+    matchups: {},
   };
   for (let i = 0; i < numGames; i += 1) {
     if (i % 10000 === 0 && i > 0) {
