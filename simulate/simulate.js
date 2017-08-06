@@ -118,6 +118,9 @@ function simulateGames() {
     cardCombos: {},
   };
   for (let i = 0; i < numGames; i += 1) {
+    if (i % 10000 === 0 && i > 0) {
+      console.log(`${i} games simulated`);
+    }
     const store = engine.init();
     store.dispatch(engine.startGame(includeCards));
     const startState = store.getState();
