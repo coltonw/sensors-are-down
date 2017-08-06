@@ -66,6 +66,7 @@ scrapHarvesters:
   strength: 3
   offense: true
   space: true
+  tribe: scrap
   count: 2
 nanightStorm:
   name: Nanight Storm
@@ -128,4 +129,14 @@ staccatoFliers:
   offense: true
   space: true
   tribe: bubble
+  count: 2
+scrapHoppers:
+  name: Scrap Hoppers
+  description: Scrap Hoppers attack stronger the more ships have died
+  special: preplaycards
+  strength: 2
+  offense: true
+  defense: true
+  space: true
+  tribe: scrap
   count: 2
