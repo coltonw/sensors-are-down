@@ -70,8 +70,8 @@ scrapHarvesters:
 nanightStorm:
   name: Nanight Storm
   description: The Nanight Storm descends on the planet like a cloud then comes back to partially re-energize before attacking again
-  strength: 4
   special: preplaycards
+  strength: 4
   offense: true
   defense: true
   planet: true
@@ -79,16 +79,16 @@ nanightStorm:
 reanimatingSlivers:
   name: Reanimating Sliver Ships
   description: The Reanimating Sliver Ships will reanimate on first death and continue fighting
-  strength: 3
   special: postcombat
+  strength: 3
   offense: true
   defense: true
   space: true
 trenchFighters:
   name: Trench Fighters
   description: Our Trench Fighters are extra difficult to destroy if we have taken hold of the planet
-  strength: 2
   special: strength
+  strength: 2
   offense: true
   defense: true
   planet: true
@@ -96,8 +96,8 @@ trenchFighters:
 puffingPlant:
   name: Puffing Plant
   description: The Puffing Plant gets stronger the more opponents it is facing
-  strength: 3
   special: strength
+  strength: 3
   offense: true
   defense: true
   planet: true
@@ -111,11 +111,21 @@ shieldBurst:
   count: 4
 sporeSoldiers:
   name: Spore Soldiers
-  description: Spore Soldiers create an effect on death that powers up all future plants on the planet
-  strength: 2
+  description: Spore Soldiers create an effect on death that powers up all of your future plants on the planet
   special: postcombat
+  strength: 2
   offense: true
   defense: true
   planet: true
   tribe: plant
+  count: 2
+staccatoFliers:
+  name: Staccato Fliers
+  description: Staccato Fliers can damage the ship through shields and weak defense
+  special: checkforvictory
+  strength: 2
+  damageStrength: 1
+  offense: true
+  space: true
+  tribe: bubble
   count: 2
