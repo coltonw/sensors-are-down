@@ -10,6 +10,7 @@
   # defense: card can be used on defense (defaults to false)
   # space: card is used in space (defaults to false)
   # planet: card is used on planet (defaults to false)
+  # tribe: card has a type that can be affected by other cards (defaults to false)
   # count: number of times card is can be used before card is removed from deck (defaults to 1)
 relentlessSwarm:
   name: Relentless Swarm
@@ -108,3 +109,13 @@ shieldBurst:
   defense: true
   space: true
   count: 4
+sporeSoldiers:
+  name: Spore Soldiers
+  description: Spore Soldiers create an effect on death that powers up all future plants on the planet
+  strength: 2
+  special: postcombat
+  offense: true
+  defense: true
+  planet: true
+  tribe: plant
+  count: 2

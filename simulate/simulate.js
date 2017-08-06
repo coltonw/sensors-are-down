@@ -52,14 +52,27 @@ function addGameEndResults(gerA = {}, gerB = {}) {
 }
 
 function recordStats(startState, endState, stats) {
+  const cardComboIds = [];
+  const cardIds = Object.keys(startState.game.playerDeck).sort();
+  for (let i = 0; i < cardIds.length - 1; i += 1) {
+    for (let j = i + 1; j < cardIds.length; j += 1) {
+      cardComboIds.push(`${cardIds[i]}-${cardIds[j]}`);
+    }
+  }
   return _.assign({}, stats, {
     total: addGameEndResults(stats.total, endState.game.gameEndResults),
     cards: _.assign({}, stats.cards, _.mapValues(startState.game.playerDeck,
         (card, cardId) => addGameEndResults(stats.cards[cardId], endState.game.gameEndResults))),
+    cardCombos: _.reduce(cardComboIds,
+      (acc, comboId) => _.assign({}, acc, {
+        [comboId]: addGameEndResults(stats.cardCombos[comboId], endState.game.gameEndResults),
+      }),
+      stats.cardCombos),
   });
 }
 
-function saveStats(stats) {
+function saveStats(statsArg) {
+  const stats = statsArg;
   const aggregateResults = (cardResults) => {
     const numGames = _.sum(_.values(cardResults));
     return {
@@ -80,13 +93,16 @@ function saveStats(stats) {
       numGames,
     };
   };
-  // eslint-disable-next-line no-param-reassign
   stats.totalOverview = aggregateResults(stats.total);
-  // eslint-disable-next-line no-param-reassign
   stats.cards = sortObj(stats.cards);
-  // eslint-disable-next-line no-param-reassign
   stats.cardOverview = sortObj(_.mapValues(stats.cards, aggregateResults));
+  const cardComboOverview = sortObj(_.mapValues(stats.cardCombos, aggregateResults));
+  // The overviews are way more interesting than these numbers
+  delete stats.total;
+  delete stats.cards;
+  delete stats.cardCombos;
   fs.writeFileSync(path.resolve(__dirname, 'results.yml'), jsYaml.dump(stats));
+  fs.writeFileSync(path.resolve(__dirname, 'resultsCombos.yml'), jsYaml.dump(cardComboOverview));
 }
 
 function simulateGames() {
@@ -99,6 +115,7 @@ function simulateGames() {
   let stats = {
     total: {},
     cards: {},
+    cardCombos: {},
   };
   for (let i = 0; i < numGames; i += 1) {
     const store = engine.init();
