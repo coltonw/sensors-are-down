@@ -49,6 +49,7 @@ tankBattalion:
   offense: true
   defense: true
   planet: true
+  recharge: 2
   count: 2
 groundTroops:
   name: Ground Troops
@@ -72,11 +73,12 @@ nanightStorm:
   name: Nanight Storm
   description: The Nanight Storm descends on the planet like a cloud then comes back to partially re-energize before attacking again
   special: preplaycards
-  strength: 4
+  strength: 3
   offense: true
   defense: true
   planet: true
-  count: 2
+  recharge: 2
+  count: 3
 reanimatingSlivers:
   name: Reanimating Sliver Ships
   description: The Reanimating Sliver Ships will reanimate on first death and continue fighting
@@ -139,4 +141,17 @@ scrapHoppers:
   defense: true
   space: true
   tribe: scrap
+  count: 2
+moltenSawTower:
+  name: Molten Saw Tower
+  description: >-
+    The Molten Saw Tower starts weak, burrowing into the planet and then explodes out
+    later when summoned having been powered up by the planets core
+  special: preplaycards
+  strength: 2
+  offense: true
+  defense: true
+  planet: true
+  tribe: scrap
+  recharge: 2
   count: 2
