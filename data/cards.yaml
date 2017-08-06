@@ -39,7 +39,7 @@ planetaryBombers:
   name: Planetary Bombers
   description: When the planet seems lost, the Planetary Bombers will destroy everything on it
   special: precombat
-  strength: 1
+  strength: 2
   defense: true
   planet: true
 tankBattalion:
@@ -77,7 +77,7 @@ nanightStorm:
   offense: true
   defense: true
   planet: true
-  recharge: 2
+  recharge: 3
   count: 3
 reanimatingSlivers:
   name: Reanimating Sliver Ships
