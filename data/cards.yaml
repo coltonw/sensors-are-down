@@ -14,7 +14,6 @@
   # count: number of times card is can be used before card is removed from deck (defaults to 1)
 relentlessSwarm:
   name: Relentless Swarm
-  description: Relentless Swarm are weak ships but we are stocked with 3 rounds of them
   strength: 2
   offense: true
   defense: true
@@ -22,7 +21,6 @@ relentlessSwarm:
   count: 3
 ionTurrets:
   name: Ion Turrets
-  description: Ion Turrets are tough. Hopefully they will hold
   strength: 3
   shieldStrength: 1
   defense: true
@@ -30,21 +28,19 @@ ionTurrets:
   tribe: turret
 assaultFrigates:
   name: Assault Frigates
-  description: Assault Frigates are our strongest ships for space combat
   strength: 4
   offense: true
   defense: true
   space: true
 planetaryBombers:
   name: Planetary Bombers
-  description: When the planet seems lost, the Planetary Bombers will destroy everything on it
+  description: The Planetary Bombers will destroy everything on the planet before landing.
   special: precombat
   strength: 2
   defense: true
   planet: true
 tankBattalion:
   name: Tank Battalion
-  description: The Tank Battalion is a consistent planet battler
   strength: 3
   offense: true
   defense: true
@@ -53,7 +49,6 @@ tankBattalion:
   count: 2
 groundTroops:
   name: Ground Troops
-  description: Ground Troops are pretty much worthless. But we throw'em down there just to disrupt things.
   strength: 2
   damageStrength: 1
   offense: true
@@ -62,7 +57,7 @@ groundTroops:
   count: 3
 scrapHarvesters:
   name: Scrap Harvesters
-  description: Our Scrap Harvesters fly in and can upgrade themselves with scrap from a defeated enemy
+  description: Scrap Harvesters strengthen themselves with scrap every time they defeat an enemy.
   special: postcombat
   strength: 3
   offense: true
@@ -71,7 +66,7 @@ scrapHarvesters:
   count: 2
 nanightStorm:
   name: Nanight Storm
-  description: The Nanight Storm descends on the planet like a cloud then comes back to partially re-energize before attacking again
+  description: The Nanight Storm is strongest on its first attack and is weaker on each subsequent attack.
   special: preplaycards
   strength: 3
   offense: true
@@ -81,7 +76,7 @@ nanightStorm:
   count: 3
 reanimatingSlivers:
   name: Reanimating Sliver Ships
-  description: The Reanimating Sliver Ships will reanimate on first death and continue fighting
+  description: The Reanimating Sliver Ships will reanimate on first death and continue fighting.
   special: postcombat
   strength: 3
   offense: true
@@ -89,7 +84,7 @@ reanimatingSlivers:
   space: true
 trenchFighters:
   name: Trench Fighters
-  description: Our Trench Fighters are extra difficult to destroy if we have taken hold of the planet
+  description: Our Trench Fighters are extra difficult to destroy if we have taken hold of the planet.
   special: strength
   strength: 2
   offense: true
@@ -98,7 +93,7 @@ trenchFighters:
   count: 3
 puffingPlant:
   name: Puffing Plant
-  description: The Puffing Plant gets stronger the more opponents it is facing
+  description: The Puffing Plant gets stronger the more opponents it is facing.
   special: strength
   strength: 3
   offense: true
@@ -107,14 +102,14 @@ puffingPlant:
   tribe: plant
 shieldBurst:
   name: Shield Burst
-  description: The Shield Burst is a pure ship defense card that blocks all damage on the ship 4 times
+  description: The Shield Burst only blocks your ship from taking damage for one round.
   strength: 0
   defense: true
   space: true
   count: 4
 sporeSoldiers:
   name: Spore Soldiers
-  description: Spore Soldiers create an effect on death that powers up all of your future plants on the planet
+  description: Spore Soldiers create an effect on death that powers up all of your future plants on the planet.
   special: postcombat
   strength: 2
   offense: true
@@ -124,7 +119,7 @@ sporeSoldiers:
   count: 2
 staccatoFliers:
   name: Staccato Fliers
-  description: Staccato Fliers can damage the ship through shields and weak defense
+  description: Staccato Fliers can damage the ship through shields and weak defense.
   special: checkforvictory
   strength: 2
   damageStrength: 1
@@ -134,7 +129,7 @@ staccatoFliers:
   count: 2
 scrapHoppers:
   name: Scrap Hoppers
-  description: Scrap Hoppers attack stronger the more ships have died
+  description: Scrap Hoppers attack stronger the more ships have died.
   special: preplaycards
   strength: 2
   offense: true
@@ -146,7 +141,7 @@ moltenSawTower:
   name: Molten Saw Tower
   description: >-
     The Molten Saw Tower starts weak, burrowing into the planet and then explodes out
-    later when summoned having been powered up by the planets core
+    later when summoned having been powered up by the planets core.
   special: preplaycards
   strength: 2
   offense: true
