@@ -6,5 +6,7 @@
 flow-typed
 
 [options]
+module.name_mapper.extension='yaml' -> '<PROJECT_ROOT>/loaders/yamlFlow.js'
+module.name_mapper.extension='yml' -> '<PROJECT_ROOT>/loaders/yamlFlow.js'
 
 [lints]

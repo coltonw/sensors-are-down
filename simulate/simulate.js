@@ -1,9 +1,19 @@
 require('babel-register');
 const _ = require('lodash');
-const yaml = require('js-yaml');
 const fs = require('fs');
+const jsYaml = require('js-yaml');
 const path = require('path');
+const allCards = require('../loaders/cards');
 const engine = require('../lib/engine');
+
+function sortObj(obj) {
+  const keys = Object.keys(obj);
+  keys.sort();
+  return keys.reduce(
+    (acc, key) =>
+      _.assign({}, acc, { [key]: obj[key] }),
+    {});
+}
 
 function runSingleGame(store) {
   let loops = 0;
@@ -42,14 +52,39 @@ function addGameEndResults(gerA = {}, gerB = {}) {
 }
 
 function recordStats(startState, endState, stats) {
+  const cardComboIds = [];
+  const matchupIds = [];
+  const cardIds = Object.keys(startState.game.playerDeck).sort();
+  for (let i = 0; i < cardIds.length - 1; i += 1) {
+    for (let j = i + 1; j < cardIds.length; j += 1) {
+      cardComboIds.push(`${cardIds[i]}-${cardIds[j]}`);
+    }
+  }
+  const aiCardIds = Object.keys(startState.game.aiDeck).sort();
+  for (let i = 0; i < cardIds.length; i += 1) {
+    for (let j = 0; j < aiCardIds.length; j += 1) {
+      matchupIds.push(`${cardIds[i]}-vs-${aiCardIds[j]}`);
+    }
+  }
   return _.assign({}, stats, {
     total: addGameEndResults(stats.total, endState.game.gameEndResults),
     cards: _.assign({}, stats.cards, _.mapValues(startState.game.playerDeck,
         (card, cardId) => addGameEndResults(stats.cards[cardId], endState.game.gameEndResults))),
+    cardCombos: _.reduce(cardComboIds,
+      (acc, comboId) => _.assign({}, acc, {
+        [comboId]: addGameEndResults(stats.cardCombos[comboId], endState.game.gameEndResults),
+      }),
+      stats.cardCombos),
+    matchups: _.reduce(matchupIds,
+      (acc, matchupId) => _.assign({}, acc, {
+        [matchupId]: addGameEndResults(stats.matchups[matchupId], endState.game.gameEndResults),
+      }),
+      stats.matchups),
   });
 }
 
-function saveStats(stats) {
+function saveStats(statsArg) {
+  const stats = statsArg;
   const aggregateResults = (cardResults) => {
     const numGames = _.sum(_.values(cardResults));
     return {
@@ -70,23 +105,40 @@ function saveStats(stats) {
       numGames,
     };
   };
-  // eslint-disable-next-line no-param-reassign
   stats.totalOverview = aggregateResults(stats.total);
-  // eslint-disable-next-line no-param-reassign
-  stats.cardOverview = _.mapValues(stats.cards, aggregateResults);
-  fs.writeFileSync(path.resolve(__dirname, 'results.yml'), yaml.dump(stats));
+  stats.cards = sortObj(stats.cards);
+  stats.cardOverview = sortObj(_.mapValues(stats.cards, aggregateResults));
+  const cardComboOverview = sortObj(_.mapValues(stats.cardCombos, aggregateResults));
+  const matchupsOverview = sortObj(_.mapValues(stats.matchups, aggregateResults));
+  // The overviews are way more interesting than these numbers
+  delete stats.total;
+  delete stats.cards;
+  delete stats.cardCombos;
+  delete stats.matchups;
+  fs.writeFileSync(path.resolve(__dirname, 'results.yml'), jsYaml.dump(stats));
+  fs.writeFileSync(path.resolve(__dirname, 'resultsCombos.yml'), jsYaml.dump(cardComboOverview));
+  fs.writeFileSync(path.resolve(__dirname, 'resultsMatchups.yml'), jsYaml.dump(matchupsOverview));
 }
 
 function simulateGames() {
   const numGames = parseInt(process.argv[2], 10) || 200;
   console.log(`Simulating ${numGames} games`);
+  const includeCards = _.intersection(process.argv.slice(3), Object.keys(allCards));
+  if (includeCards.length > 0) {
+    console.log(`including ${includeCards.join(' and ')} in all player decks`);
+  }
   let stats = {
     total: {},
     cards: {},
+    cardCombos: {},
+    matchups: {},
   };
   for (let i = 0; i < numGames; i += 1) {
+    if (i % 10000 === 0 && i > 0) {
+      console.log(`${i} games simulated`);
+    }
     const store = engine.init();
-    store.dispatch(engine.startGame());
+    store.dispatch(engine.startGame(includeCards));
     const startState = store.getState();
     runSingleGame(store);
     const endState = store.getState();
