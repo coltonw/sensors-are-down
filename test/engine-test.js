@@ -27,7 +27,7 @@ describe('engine', () => {
     assert.deepEqual(noCardsResult, noCardsPreCombat, 'no cards to still no cards');
 
     const oneSideCardsPreCombat = {
-      playerCards: [{ cardUid: '1', strength: 2, defense: 1 }, { cardUid: '2', strength: 1 }],
+      playerCards: [{ cardUid: '1', strength: 2, defense: 1, armorStrength: 0 }, { cardUid: '2', strength: 1, armorStrength: 0 }],
       aiCards: [],
       playerGraveyard: [],
       aiGraveyard: [],
@@ -38,8 +38,8 @@ describe('engine', () => {
 
     const zeroStrength = cards => cards.map(card => _.assign({}, card, { strength: 0 }));
     const evenStrengthPreCombat = {
-      playerCards: [{ cardUid: '1', strength: 2 }, { cardUid: '2', strength: 1 }],
-      aiCards: [{ cardUid: '3', strength: 3 }],
+      playerCards: [{ cardUid: '1', strength: 2, armorStrength: 0 }, { cardUid: '2', strength: 1, armorStrength: 0 }],
+      aiCards: [{ cardUid: '3', strength: 3, armorStrength: 0 }],
       playerGraveyard: [],
       aiGraveyard: [],
     };
@@ -59,10 +59,10 @@ describe('engine', () => {
       aiGraveyard: [],
     }, {});
     assert.deepEqual(defenseBonusWorksResult, {
-      playerCards: [{ cardUid: '1', strength: 2, someIgnored: 'stuff' }],
+      playerCards: [{ cardUid: '1', strength: 2, armorStrength: 0, someIgnored: 'stuff' }],
       aiCards: [],
       playerGraveyard: [],
-      aiGraveyard: [{ cardUid: '2', strength: 0 }],
+      aiGraveyard: [{ cardUid: '2', strength: 0, armorStrength: 0 }],
     }, 'defense bonus works as expected');
 
     const offenseWorksResult = combatHelper({
@@ -74,42 +74,42 @@ describe('engine', () => {
     assert.deepEqual(offenseWorksResult, {
       playerCards: [],
       aiCards: [],
-      playerGraveyard: [{ cardUid: '1', strength: 0, someIgnored: 'stuff' }],
-      aiGraveyard: [{ cardUid: '2', strength: 0, damageStrength: 2 }],
+      playerGraveyard: [{ cardUid: '1', strength: 0, armorStrength: 0, someIgnored: 'stuff' }],
+      aiGraveyard: [{ cardUid: '2', strength: 0, armorStrength: 0, damageStrength: 2 }],
     }, 'offense on cards works properly');
 
     const defenseWorksResult = combatHelper({
-      playerCards: [{ cardUid: '1', strength: 4, someIgnored: 'stuff' }],
-      aiCards: [{ cardUid: '2', strength: 3, shieldStrength: 2 }],
+      playerCards: [{ cardUid: '1', strength: 4, armorStrength: 0, someIgnored: 'stuff' }],
+      aiCards: [{ cardUid: '2', strength: 3, shieldStrength: 2, armorStrength: 0 }],
       playerGraveyard: [],
       aiGraveyard: [],
     }, {});
     assert.deepEqual(defenseWorksResult, {
-      playerCards: [{ cardUid: '1', strength: 2, someIgnored: 'stuff' }],
-      aiCards: [{ cardUid: '2', strength: 1, shieldStrength: 2 }],
+      playerCards: [{ cardUid: '1', strength: 2, armorStrength: 0, someIgnored: 'stuff' }],
+      aiCards: [{ cardUid: '2', strength: 1, shieldStrength: 2, armorStrength: 0 }],
       playerGraveyard: [],
       aiGraveyard: [],
     }, 'defense on cards works properly');
 
     const deleteAFewPreCombat = {
       playerCards: [
-        { cardUid: '1', strength: 2 },
-        { cardUid: '2', strength: 1 },
-        { cardUid: '3', strength: 2 }],
-      aiCards: [{ cardUid: '4', strength: 3 }, { cardUid: '5', strength: 4 }],
-      playerGraveyard: [{ cardUid: 'alreadyDead', strength: 0 }],
+        { cardUid: '1', strength: 2, armorStrength: 0 },
+        { cardUid: '2', strength: 1, armorStrength: 0 },
+        { cardUid: '3', strength: 2, armorStrength: 0 }],
+      aiCards: [{ cardUid: '4', strength: 3, armorStrength: 0 }, { cardUid: '5', strength: 4, armorStrength: 0 }],
+      playerGraveyard: [{ cardUid: 'alreadyDead', strength: 0, armorStrength: 0 }],
       aiGraveyard: [],
     };
     const deleteAFewResult = combatHelper(deleteAFewPreCombat, {});
     assert.deepEqual(deleteAFewResult, {
       playerCards: [],
-      aiCards: [{ cardUid: '5', strength: 3 }],
+      aiCards: [{ cardUid: '5', strength: 3, armorStrength: 0 }],
       playerGraveyard: [
-        { cardUid: 'alreadyDead', strength: 0 },
-        { cardUid: '1', strength: 0 },
-        { cardUid: '2', strength: 0 },
-        { cardUid: '3', strength: 0 }],
-      aiGraveyard: [{ cardUid: '4', strength: 0 }],
+        { cardUid: 'alreadyDead', strength: 0, armorStrength: 0 },
+        { cardUid: '1', strength: 0, armorStrength: 0 },
+        { cardUid: '2', strength: 0, armorStrength: 0 },
+        { cardUid: '3', strength: 0, armorStrength: 0 }],
+      aiGraveyard: [{ cardUid: '4', strength: 0, armorStrength: 0 }],
     }, 'delete a bunch');
   });
 

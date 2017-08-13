@@ -112,6 +112,7 @@ sporeSoldiers:
   description: Spore Soldiers create an effect on death that powers up all of your future plants on the planet.
   special: postcombat
   strength: 2
+  armorStrength: 2
   offense: true
   defense: true
   planet: true
@@ -150,3 +151,11 @@ moltenSawTower:
   tribe: scrap
   recharge: 2
   count: 2
+armoredBubble:
+  name: Armored Bubble
+  strength: 3
+  armorStrength: 2
+  offense: true
+  defense: true
+  space: true
+  tribe: bubble
