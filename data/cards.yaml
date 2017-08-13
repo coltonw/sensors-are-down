@@ -6,11 +6,13 @@
   # strength: base strength of card (defaults to 0)
   # damageStrength: bonus strength only used damaging the opponent card (defaults to 0)
   # shieldStrength: bonus strength only used when being damaged (defaults to 0)
+  # armorStrength: armor strength must be removed before real strength (defaults to 0)
   # offense: card can be used on offense (defaults to false)
   # defense: card can be used on defense (defaults to false)
   # space: card is used in space (defaults to false)
   # planet: card is used on planet (defaults to false)
   # tribe: card has a type that can be affected by other cards (defaults to false)
+  # recharge: card takes this many turns before it can be possibly used again (defaults to 0)
   # count: number of times card is can be used before card is removed from deck (defaults to 1)
 relentlessSwarm:
   name: Relentless Swarm
