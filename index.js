@@ -4,7 +4,7 @@ const _ = require('lodash');
 const engine = require('./lib/engine');
 const speeches = require('./lib/speeches');
 const unstackSpeech = require('./lib/unstackSpeech');
-const strings = require('./strings/strings.yaml');
+const strings = require('./data/strings.yaml');
 
 const states = {
   GAMEMODE: '_GAMEMODE', // User is playing the game.
@@ -135,15 +135,10 @@ const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
   DescribeIntent() {
     console.log('Describe intent');
     const store = engine.init(this.attributes.gameState);
-    const cardChoices = speeches.getChoices(store.getState());
-    let messageSoFar = '';
-    // TODO: also describe the opponent's offensive choice when defending
-    const choiceDescs = _.map(
-      _.values(cardChoices.playerCards),
-      value => value.description);
-    messageSoFar += [...choiceDescs, ''].join(' <break strength="x-strong" /> ');
-
-    this.emit('RunGame', messageSoFar);
+    const speechObj = unstackSpeech([
+      speeches.describeChoiceCards,
+    ], store.getState());
+    this.emit('RunGame', speechObj.output);
   },
   // TODO: add yes intent for when there is only one choice to deploy
   'AMAZON.HelpIntent': function HelpIntent() {
@@ -197,7 +192,7 @@ const statelessHandlers = {
 
 // eslint-disable-next-line no-unused-vars
 exports.handler = function handler(event, context, callback) {
-  const alexa = Alexa.handler(event, context);
+  const alexa = Alexa.handler(event, context, callback);
   alexa.appId = config.deployment.appId;
   alexa.dynamoDBTableName = config.db.tableName;
   alexa.registerHandlers(newSessionHandlers,
