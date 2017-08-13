@@ -1,6 +1,5 @@
 const Alexa = require('alexa-sdk');
 const config = require('config');
-const _ = require('lodash');
 const engine = require('./lib/engine');
 const speeches = require('./lib/speeches');
 const unstackSpeech = require('./lib/unstackSpeech');
