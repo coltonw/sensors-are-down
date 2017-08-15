@@ -154,7 +154,10 @@ describe('engine', () => {
     const applicableDefenseCardsCount =
       _.values(store.getState().game.offenseCardChoices.aiCards)[0].space ?
         shipDefenseCount : planetDefenseCount;
-    assert.equal(Object.keys(store.getState().game.defenseCardChoices.playerCards).length, Math.min(2, applicableDefenseCardsCount), 'two choices are presented');
+    assert.equal(
+      _.filter(_.values(store.getState().game.defenseCardChoices.playerCards),
+        card => !card.development).length,
+      Math.min(2, applicableDefenseCardsCount), 'two choices are presented');
   });
 
   it('should properly remove cards from opponent deck', () => {

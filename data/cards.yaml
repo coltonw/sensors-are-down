@@ -10,6 +10,7 @@
   # armorStrength: armor strength must be removed before real strength (defaults to 0)
   # offense: card can be used on offense (defaults to false)
   # defense: card can be used on defense (defaults to false)
+  # development: card can be played instead of a defense (defaults to false)
   # space: card is used in space (defaults to false)
   # planet: card is used on planet (defaults to false)
   # tribe: card has a type that can be affected by other cards (defaults to false)
@@ -178,9 +179,27 @@ treeOfTheStars:
 starSplinters:
   generated: true
   name: Star Splinters
+  description: These are generated when a Tree of the Stars dies.
   strength: 2
   offense: true
   defense: true
   planet: true
   tribe: plant
   count: 2
+reinforcedGleam:
+  name: Reinforced Gleam
+  description: >-
+    All undeployed tactics in the bubble group gain extra armor.
+  development: true
+  tribe: bubble
+hoverTanks:
+  name: Hover Tanks
+  description: If Hover Tanks survive one round of combat, they become stronger.
+  special: postcombat
+  strength: 2
+  armorStrength: 1
+  offense: true
+  defense: true
+  planet: true
+  count: 3
+  tribe: bubble

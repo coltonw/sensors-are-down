@@ -59,7 +59,37 @@ describe('specials', () => {
     const newState = playSpecials('postcombat', postCombatState, preCombatState);
     assert.equal(newState.ships.aiShip.aiCards.length, 1);
     assert.equal(newState.ships.aiShip.aiCards[0].strength, 2);
-    assert.equal(newState.ships.aiShip.aiCards[0].zombie, true);
+    assert.equal(newState.ships.aiShip.aiCards[0].raw.zombie, true);
+  });
+  it('should revive reanimatingSlivers only once', () => {
+    const preCombatState = {
+      ships: {
+        playerShip: {
+          playerCards: [],
+          aiCards: [],
+        },
+        aiShip: {
+          playerCards: [{ cardId: 'strongCard', strength: 4 }],
+          aiCards: [{ cardId: 'reanimatingSlivers', strength: 3, raw: { zombie: true }, special: 'postcombat' }],
+        },
+      },
+      planet: {
+        playerCards: [],
+        aiCards: [],
+      },
+    };
+    const postCombatState = {
+      ...preCombatState,
+      ships: {
+        ...preCombatState.ships,
+        aiShip: {
+          playerCards: [{ cardId: 'strongCard', strength: 2 }],
+          aiCards: [],
+        },
+      },
+    };
+    const newState = playSpecials('postcombat', postCombatState, preCombatState);
+    assert.equal(newState.ships.aiShip.aiCards.length, 0);
   });
   it('should revive multiple reanimatingSlivers properly', () => {
     const preCombatState = {
@@ -93,9 +123,9 @@ describe('specials', () => {
     const newState = playSpecials('postcombat', postCombatState, preCombatState);
     assert.equal(newState.ships.playerShip.playerCards.length, 2);
     assert.equal(newState.ships.playerShip.playerCards[0].strength, 2);
-    assert.equal(newState.ships.playerShip.playerCards[0].zombie, true);
+    assert.equal(newState.ships.playerShip.playerCards[0].raw.zombie, true);
     assert.equal(newState.ships.playerShip.playerCards[1].strength, 2);
-    assert.equal(newState.ships.playerShip.playerCards[1].zombie, true);
+    assert.equal(newState.ships.playerShip.playerCards[1].raw.zombie, true);
   });
   it('should not revive living reanimatingSlivers properly', () => {
     const preCombatState = {
