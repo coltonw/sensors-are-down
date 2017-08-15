@@ -117,9 +117,9 @@ sporeSoldiers:
   planet: true
   tribe: plant
   count: 2
-staccatoFliers:
-  name: Staccato Fliers
-  description: Staccato Fliers can damage the ship through shields and weak defense.
+staccatoFlyers:
+  name: Staccato Flyers
+  description: Staccato Flyers can damage the ship through shields and weak defense.
   special: checkforvictory
   strength: 2
   damageStrength: 1

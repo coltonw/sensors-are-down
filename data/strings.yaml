@@ -6,7 +6,9 @@ welcome:
     Welcome to Sensors are Down, a space combat game.
     <audio src="https://s3.amazonaws.com/sensorsaredown-static-files/mp3/explosion.mp3" />
   firstTimePrompt: It looks like you're new. Would you like to learn how to play the game?
-  firstTimeReprompt: Say yes to learn how to play, no to start the game without instructions, or quit to quit.
+  firstTimeReprompt: Say yes to learn how to play, no to start the game without instructions, or stop to quit.
+  resumePrompt: You have a game in progress. Would you like to resume? Say yes, no, stop, or how do I play.
+  resumeReprompt: Say yes to resume the game, no to start a new game, stop to quit, or how do I play to learn how to play.
   prompt: Would you like to play? Say yes, no, or how do I play.
   reprompt: Say yes to start the game, no to quit, or how do I play to learn how to play.
 goodbye: Goodbye!
