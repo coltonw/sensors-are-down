@@ -203,3 +203,48 @@ hoverTanks:
   planet: true
   count: 3
   tribe: bubble
+bubbleFactory:
+  name: Bubble Factory
+  description: Every turn the Bubble Factory is alive it will creates bubble shuttle and bubble bots for future deployment.
+  special: precombat
+  strength: 2
+  armorStrength: 2
+  offense: true
+  defense: true
+  planet: true
+  tribe: bubble
+bubbleShuttles:
+  generated: true
+  name: Bubble Shuttles
+  description: Bubble Shuttles are created by a working Bubble Factory.
+  strength: 2
+  offense: true
+  defense: true
+  space: true
+  tribe: bubble
+bubbleBots:
+  generated: true
+  name: Bubble Bots
+  description: Bubble Bots are created by a working Bubble Factory.
+  strength: 2
+  offense: true
+  defense: true
+  planet: true
+  tribe: bubble
+seedPodDropper:
+  name: Seed Pod Dropper
+  description: Seed Pod Dropper immediately deploys seed pods to the planet when deployed.
+  special: preplaycards
+  strength: 2
+  offense: true
+  defense: true
+  space: true
+  tribe: plant
+seedPod:
+  generated: true
+  name: Seed Pod
+  strength: 2
+  offense: true
+  defense: true
+  planet: true
+  tribe: plant
