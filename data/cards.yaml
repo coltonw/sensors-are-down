@@ -118,7 +118,7 @@ shieldBurst:
 sporeSoldiers:
   name: Spore Soldiers
   description: Spore Soldiers create an effect on death that powers up all of your future plants on the planet.
-  special: postcombat
+  special: graveyard-preplaycards
   strength: 2
   armorStrength: 2
   offense: true
