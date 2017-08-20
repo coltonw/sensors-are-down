@@ -68,10 +68,10 @@ scrapHarvesters:
   description: Scrap Harvesters strengthen themselves with scrap every time they defeat an enemy.
   special: postcombat
   strength: 3
+  armorStrength: 1
   offense: true
   space: true
   tribe: scrap
-  count: 2
 nanightStorm:
   name: Nanight Storm
   description: The Nanight Storm is strongest on its first attack and is weaker on each subsequent attack.
@@ -256,3 +256,13 @@ scrapReanimator:
   development: true
   tribe: scrap
   strategy: late
+barbedClusterShips:
+  name: Barbed Cluster Ships
+  description: Barbed Cluster Ships weaken all future enemies deployed to a ship after they have died.
+  special: graveyard-preplaycards
+  strength: 3
+  damageStrength: 1
+  offense: true
+  defense: true
+  space: true
+  tribe: plant
