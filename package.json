@@ -39,7 +39,8 @@
     "js-yaml": "^3.8.4",
     "lodash": "^4.17.4",
     "redux": "^3.7.0",
-    "shortid": "^2.2.8"
+    "shortid": "^2.2.8",
+    "yargs": "^8.0.2"
   },
   "scripts": {
     "start": "CLI_MODE=true babel-node cli",

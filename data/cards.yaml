@@ -192,6 +192,7 @@ reinforcedGleam:
     All undeployed tactics in the bubble group gain extra armor.
   development: true
   tribe: bubble
+  strategy: safe
 hoverTanks:
   name: Hover Tanks
   description: If Hover Tanks survive one round of combat, they become stronger.
@@ -248,3 +249,10 @@ seedPod:
   defense: true
   planet: true
   tribe: plant
+scrapReanimator:
+  name: Scrap Reanimator
+  description: >-
+    All dead scrap tactics are reclaimed and reanimated to be deployed later.
+  development: true
+  tribe: scrap
+  strategy: late
