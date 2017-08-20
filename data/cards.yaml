@@ -14,6 +14,7 @@
   # space: card is used in space (defaults to false)
   # planet: card is used on planet (defaults to false)
   # tribe: card has a type that can be affected by other cards (defaults to false)
+  # tank: card will move to the front of the line to block damage for other units. (defaults to false)
   # recharge: card takes this many turns before it can be possibly used again (defaults to 0)
   # count: number of times card is can be used before card is removed from deck (defaults to 1)
 relentlessSwarm:
@@ -266,3 +267,13 @@ barbedClusterShips:
   defense: true
   space: true
   tribe: plant
+rovingBubbleShield:
+  name: Roving Bubble Shield
+  strength: 1
+  shieldStrength: 1
+  armorStrength: 7
+  offense: true
+  defense: true
+  planet: true
+  tribe: bubble
+  tank: true
