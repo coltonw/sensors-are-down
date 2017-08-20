@@ -269,9 +269,9 @@ barbedClusterShips:
   tribe: plant
 rovingBubbleShield:
   name: Roving Bubble Shield
-  strength: 1
+  strength: 2
   shieldStrength: 1
-  armorStrength: 7
+  armorStrength: 9
   offense: true
   defense: true
   planet: true
