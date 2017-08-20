@@ -8,9 +8,12 @@ const readline = require('readline');
 const allCards = require('../loaders/cards');
 const engine = require('../lib/engine');
 
-function sortObj(obj) {
-  const keys = Object.keys(obj);
-  keys.sort();
+function sortObj(obj, sortedKeys) {
+  let keys = sortedKeys;
+  if (!keys) {
+    keys = Object.keys(obj);
+    keys.sort();
+  }
   return keys.reduce(
     (acc, key) =>
       _.assign({}, acc, { [key]: obj[key] }),
@@ -129,13 +132,17 @@ function recordStats(startState, endState, stats) {
   const cardIds = Object.keys(startState.game.playerDeck).sort();
   for (let i = 0; i < cardIds.length - 1; i += 1) {
     for (let j = i + 1; j < cardIds.length; j += 1) {
-      cardComboIds.push(`${cardIds[i]}-${cardIds[j]}`);
+      if (cardIds[i] !== 'deadCard' && cardIds[j] !== 'deadCard') {
+        cardComboIds.push(`${cardIds[i]}-${cardIds[j]}`);
+      }
     }
   }
   const aiCardIds = Object.keys(startState.game.aiDeck).sort();
   for (let i = 0; i < cardIds.length; i += 1) {
     for (let j = 0; j < aiCardIds.length; j += 1) {
-      matchupIds.push(`${cardIds[i]}-vs-${aiCardIds[j]}`);
+      if (cardIds[i] !== 'deadCard' && cardIds[j] !== 'deadCard') {
+        matchupIds.push(`${cardIds[i]}-vs-${aiCardIds[j]}`);
+      }
     }
   }
   return _.assign({}, stats, {
@@ -180,6 +187,17 @@ function saveStats(statsArg) {
   stats.totalOverview = aggregateResults(stats.total);
   stats.cards = sortObj(stats.cards);
   stats.cardOverview = sortObj(_.mapValues(stats.cards, aggregateResults));
+  const deadCard = stats.cardOverview.deadCard;
+  delete stats.cards.deadCard;
+  delete stats.cardOverview.deadCard;
+  const cardsWithValues = _.mapValues(stats.cardOverview,
+    cardSumm =>
+      _.round((cardSumm.victoryPct - deadCard.victoryPct) /
+      (stats.totalOverview.victoryPct - deadCard.victoryPct), 2));
+  const cardRankings = _.fromPairs(
+    _.sortBy(
+      _.toPairs(cardsWithValues),
+      cardValPair => -cardValPair[1]));
   const cardComboOverview = sortObj(_.mapValues(stats.cardCombos, aggregateResults));
   const matchupsOverview = sortObj(_.mapValues(stats.matchups, aggregateResults));
   // The overviews are way more interesting than these numbers
@@ -188,6 +206,7 @@ function saveStats(statsArg) {
   delete stats.cardCombos;
   delete stats.matchups;
   fs.writeFileSync(path.resolve(__dirname, 'results.yml'), jsYaml.dump(stats));
+  fs.writeFileSync(path.resolve(__dirname, 'resultsRankings.yml'), jsYaml.dump(cardRankings));
   fs.writeFileSync(path.resolve(__dirname, 'resultsCombos.yml'), jsYaml.dump(cardComboOverview));
   fs.writeFileSync(path.resolve(__dirname, 'resultsMatchups.yml'), jsYaml.dump(matchupsOverview));
 }
@@ -205,10 +224,17 @@ function simulateGames() {
     cardCombos: {},
     matchups: {},
   };
+  // We add in a dead card which does nothing to help detect
+  // if a card actually has a net negative effect on win percentage
+  const allCardsPlusDead = _.assign({},
+    allCards,
+    {
+      deadCard: { name: 'Dead Card' },
+    });
   console.log('');
   for (let i = 0; i < numGames; i += 1) {
     const store = engine.init();
-    store.dispatch(engine.startGame(includeCards));
+    store.dispatch(engine.startGame(includeCards, allCardsPlusDead));
     const startState = store.getState();
     runSingleGame(store, argv.ai, argv.verbose);
     const endState = store.getState();
