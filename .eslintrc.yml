@@ -26,4 +26,5 @@
       - error
       - devDependencies:
         - simulate.js
+        - simulateSubProcess.js
         - webpack.config.js
