@@ -63,13 +63,14 @@ function saveStats(statsArg) {
   stats.totalOverview = aggregateResults(stats.total);
   stats.cards = sortObj(stats.cards);
   stats.cardOverview = sortObj(_.mapValues(stats.cards, aggregateResults));
-  const deadCard = stats.cardOverview.deadCard;
+  const deadCardVictoryPct =
+    stats.cardOverview.deadCard ? stats.cardOverview.deadCard.victoryPct || 0 : 0;
   delete stats.cards.deadCard;
   delete stats.cardOverview.deadCard;
   const cardsWithValues = _.mapValues(stats.cardOverview,
     cardSumm =>
-      _.round((cardSumm.victoryPct - deadCard.victoryPct) /
-      (stats.totalOverview.victoryPct - deadCard.victoryPct), 2));
+      _.round((cardSumm.victoryPct - deadCardVictoryPct) /
+      (stats.totalOverview.victoryPct - deadCardVictoryPct), 2));
   const cardRankings = _.fromPairs(
     _.sortBy(
       _.toPairs(cardsWithValues),

@@ -4,18 +4,6 @@ const argv = require('yargs').boolean('ai').boolean('verbose').argv;
 const allCards = require('../loaders/cards');
 const engine = require('../lib/engine');
 
-function sortObj(obj, sortedKeys) {
-  let keys = sortedKeys;
-  if (!keys) {
-    keys = Object.keys(obj);
-    keys.sort();
-  }
-  return keys.reduce(
-    (acc, key) =>
-      _.assign({}, acc, { [key]: obj[key] }),
-    {});
-}
-
 const pick = (cards, useAi, state) => {
   if (useAi) {
     const early = _.sample(_.filter(Object.keys(cards),
