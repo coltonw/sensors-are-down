@@ -15,6 +15,7 @@
   # planet: card is used on planet (defaults to false)
   # tribe: card has a type that can be affected by other cards (defaults to false)
   # tank: card will move to the front of the line to block damage for other units. (defaults to false)
+  # shy: card will move to the other ship when a card is played to their zone; space MUST be true (defaults to false)
   # recharge: card takes this many turns before it can be possibly used again (defaults to 0)
   # offensePriority:
   #   low = card will only be available to pick unless no remaining cards to pick
@@ -283,3 +284,11 @@ rovingBubbleShield:
   planet: true
   tribe: bubble
   tank: true
+fleetingFleet:
+  name: Fleeting Fleet
+  strength: 3
+  damageStrength: 1
+  offense: true
+  defense: true
+  space: true
+  shy: true # needs to be described
