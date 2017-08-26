@@ -21,19 +21,28 @@ const pick = (cards, useAi, state) => {
     const notLateCards = _.filter(Object.keys(cards),
       cardId => cards[cardId].strategy !== 'late' && cards[cardId].strategy !== 'safe');
     if (notLateCards.length > 0) {
-      const shipCard = _.sample(_.filter(notLateCards, cardId => cards[cardId].space));
-      const planetCard = _.sample(_.filter(notLateCards, cardId => cards[cardId].planet));
+      const defendBothCards = _.filter(notLateCards, cardId => cards[cardId].strategy === 'defendBoth');
+      const shipCards = _.filter(notLateCards, cardId => cards[cardId].space);
+      const planetCards = _.filter(notLateCards, cardId => cards[cardId].planet);
       if (state.defenseCardChoices) {
         // AI on defense
-        if (state.planet.playerCards.length === 0 && state.planet.aiEntrenched && planetCard) {
-          return planetCard;
+        const shipCard = _.sample(_.difference(shipCards, defendBothCards));
+        const planetCard = _.sample(_.difference(planetCards, defendBothCards));
+        const bothCard = _.sample(defendBothCards);
+        if (state.planet.playerCards.length === 0 && state.planet.aiCards.length > 0 &&
+            state.ships.playerShip.playerCards.length === 0 &&
+            state.ships.playerShip.aiCards.length > 0 && bothCard) {
+          return bothCard;
+        } else if (state.planet.playerCards.length === 0 &&
+            state.planet.aiEntrenched && (planetCard || bothCard)) {
+          return planetCard || bothCard;
         } else if (state.ships.playerShip.playerCards.length === 0 &&
-            state.ships.playerShip.shipDamage && shipCard) {
-          return shipCard;
-        } else if (state.planet.playerCards.length === 0 && planetCard) {
-          return planetCard;
-        } else if (state.ships.playerShip.playerCards.length === 0 && shipCard) {
-          return shipCard;
+            state.ships.playerShip.shipDamage && (shipCard || bothCard)) {
+          return shipCard || bothCard;
+        } else if (state.planet.playerCards.length === 0 && (planetCard || bothCard)) {
+          return planetCard || bothCard;
+        } else if (state.ships.playerShip.playerCards.length === 0 && (shipCard || bothCard)) {
+          return shipCard || bothCard;
         }
       } else {
         // AI on offense
@@ -45,6 +54,8 @@ const pick = (cards, useAi, state) => {
           card => card.space && card.defense).length;
         const planetDefCount = _.filter(_.values(state.playerDeck),
           card => card.planet && card.defense).length;
+        const planetCard = _.sample(planetCards);
+        const shipCard = _.sample(shipCards);
         if (planetCard && planetDefCount > shipDefCount) {
           return planetCard;
         } else if (shipCard && shipDefCount > planetDefCount) {

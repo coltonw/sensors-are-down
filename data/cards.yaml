@@ -249,6 +249,7 @@ seedPodDropper:
   defense: true
   space: true
   tribe: plant
+  strategy: defendBoth
 seedPod:
   generated: true
   name: Seed Pod
@@ -291,4 +292,27 @@ fleetingFleet:
   offense: true
   defense: true
   space: true
-  shy: true # needs to be described
+  shy: true
+stasisField:
+  name: Stasis Field
+  description: The Stasis Field will freeze the enemies and prevent them from doing damage in all zones.
+  development: true
+  strategy: defendBoth
+morphingPodWalkers:
+  name: Morphing Pod Walkers
+  description: Morphing Pod Walkers have shields if deployed for defense and do extra damage if deployed for offense.
+  special: preplaycards
+  strength: 2
+  offense: true
+  defense: true
+  planet: true
+  tribe: bubble
+  count: 2
+
+# note for some unimplmented cards
+# armorShredder: precombat, destroys 5 armor from opponents, tribe: scrap
+# blackHoleFisherShip: precombat, destroys all opponents with 2 strength or less
+# add attack speed default 2, where things with speed 3 attack before anything else and things with speed 3 attack after everything else
+# - lightRiders: basic speed 3 ship count >1
+# - capitalClassWarShip: basic very strong 1 speed ship count 1
+# - timeFieldGenerator: squads played to the planet gain 1 speed
