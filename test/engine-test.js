@@ -19,62 +19,98 @@ describe('engine', () => {
     const noCardsPreCombat = {
       playerCards: [],
       aiCards: [],
+      playerGraveyard: [],
+      aiGraveyard: [],
       keepYour: 'mangy hands off me',
     };
     const noCardsResult = combatHelper(noCardsPreCombat, {});
     assert.deepEqual(noCardsResult, noCardsPreCombat, 'no cards to still no cards');
 
     const oneSideCardsPreCombat = {
-      playerCards: [{ cardUid: '1', strength: 2, defense: 1 }, { cardUid: '2', strength: 1 }],
+      playerCards: [{ cardUid: '1', strength: 2, defense: 1, armorStrength: 0 }, { cardUid: '2', strength: 1, armorStrength: 0 }],
       aiCards: [],
+      playerGraveyard: [],
+      aiGraveyard: [],
       pleaseDont: 'touch this',
     };
     const oneSideCardsResult = combatHelper(oneSideCardsPreCombat, {});
     assert.deepEqual(oneSideCardsResult, oneSideCardsPreCombat, 'one card to still one card');
 
+    const zeroStrength = cards => cards.map(card => _.assign({}, card, { strength: 0 }));
     const evenStrengthPreCombat = {
-      playerCards: [{ cardUid: '1', strength: 2 }, { cardUid: '2', strength: 1 }],
-      aiCards: [{ cardUid: '3', strength: 3 }],
+      playerCards: [{ cardUid: '1', strength: 2, armorStrength: 0 }, { cardUid: '2', strength: 1, armorStrength: 0 }],
+      aiCards: [{ cardUid: '3', strength: 3, armorStrength: 0 }],
+      playerGraveyard: [],
+      aiGraveyard: [],
     };
     const evenStrengthResult = combatHelper(evenStrengthPreCombat, {});
-    assert.deepEqual(evenStrengthResult, { playerCards: [], aiCards: [] }, 'even strength everything dies');
+    assert.deepEqual(evenStrengthResult,
+      {
+        playerCards: [],
+        aiCards: [],
+        playerGraveyard: zeroStrength(evenStrengthPreCombat.playerCards),
+        aiGraveyard: zeroStrength(evenStrengthPreCombat.aiCards),
+      }, 'even strength everything dies');
 
     const defenseBonusWorksResult = combatHelper({
       playerCards: [{ cardUid: '1', strength: 4, someIgnored: 'stuff' }],
       aiCards: [{ cardUid: '2', strength: 3 }],
+      playerGraveyard: [],
+      aiGraveyard: [],
     }, {});
     assert.deepEqual(defenseBonusWorksResult, {
-      playerCards: [{ cardUid: '1', strength: 2, someIgnored: 'stuff' }],
+      playerCards: [{ cardUid: '1', strength: 2, armorStrength: 0, someIgnored: 'stuff' }],
       aiCards: [],
+      playerGraveyard: [],
+      aiGraveyard: [{ cardUid: '2', strength: 0, armorStrength: 0 }],
     }, 'defense bonus works as expected');
 
     const offenseWorksResult = combatHelper({
       playerCards: [{ cardUid: '1', strength: 4, someIgnored: 'stuff' }],
       aiCards: [{ cardUid: '2', strength: 3, damageStrength: 2 }],
+      playerGraveyard: [],
+      aiGraveyard: [],
     }, {});
     assert.deepEqual(offenseWorksResult, {
       playerCards: [],
       aiCards: [],
+      playerGraveyard: [{ cardUid: '1', strength: 0, armorStrength: 0, someIgnored: 'stuff' }],
+      aiGraveyard: [{ cardUid: '2', strength: 0, armorStrength: 0, damageStrength: 2 }],
     }, 'offense on cards works properly');
 
     const defenseWorksResult = combatHelper({
-      playerCards: [{ cardUid: '1', strength: 4, someIgnored: 'stuff' }],
-      aiCards: [{ cardUid: '2', strength: 3, shieldStrength: 2 }],
+      playerCards: [{ cardUid: '1', strength: 4, armorStrength: 0, someIgnored: 'stuff' }],
+      aiCards: [{ cardUid: '2', strength: 3, shieldStrength: 2, armorStrength: 0 }],
+      playerGraveyard: [],
+      aiGraveyard: [],
     }, {});
     assert.deepEqual(defenseWorksResult, {
-      playerCards: [{ cardUid: '1', strength: 2, someIgnored: 'stuff' }],
-      aiCards: [{ cardUid: '2', strength: 1, shieldStrength: 2 }],
+      playerCards: [{ cardUid: '1', strength: 2, armorStrength: 0, someIgnored: 'stuff' }],
+      aiCards: [{ cardUid: '2', strength: 1, shieldStrength: 2, armorStrength: 0 }],
+      playerGraveyard: [],
+      aiGraveyard: [],
     }, 'defense on cards works properly');
 
     const deleteAFewPreCombat = {
       playerCards: [
-        { cardUid: '1', strength: 2 },
-        { cardUid: '2', strength: 1 },
-        { cardUid: '3', strength: 2 }],
-      aiCards: [{ cardUid: '4', strength: 3 }, { cardUid: '5', strength: 4 }],
+        { cardUid: '1', strength: 2, armorStrength: 0 },
+        { cardUid: '2', strength: 1, armorStrength: 0 },
+        { cardUid: '3', strength: 2, armorStrength: 0 }],
+      aiCards: [{ cardUid: '4', strength: 3, armorStrength: 0 }, { cardUid: '5', strength: 4, armorStrength: 0 }],
+      playerGraveyard: [{ cardUid: 'alreadyDead', strength: 0, armorStrength: 0 }],
+      aiGraveyard: [],
     };
     const deleteAFewResult = combatHelper(deleteAFewPreCombat, {});
-    assert.deepEqual(deleteAFewResult, { playerCards: [], aiCards: [{ cardUid: '5', strength: 3 }] }, 'delete a bunch');
+    assert.deepEqual(deleteAFewResult, {
+      playerCards: [],
+      aiCards: [{ cardUid: '5', strength: 3, armorStrength: 0 }],
+      playerGraveyard: [
+        { cardUid: 'alreadyDead', strength: 0, armorStrength: 0 },
+        { cardUid: '1', strength: 0, armorStrength: 0 },
+        { cardUid: '2', strength: 0, armorStrength: 0 },
+        { cardUid: '3', strength: 0, armorStrength: 0 }],
+      aiGraveyard: [{ cardUid: '4', strength: 0, armorStrength: 0 }],
+    }, 'delete a bunch');
   });
 
   it('should properly play your first card', () => {
@@ -118,7 +154,10 @@ describe('engine', () => {
     const applicableDefenseCardsCount =
       _.values(store.getState().game.offenseCardChoices.aiCards)[0].space ?
         shipDefenseCount : planetDefenseCount;
-    assert.equal(Object.keys(store.getState().game.defenseCardChoices.playerCards).length, Math.min(2, applicableDefenseCardsCount), 'two choices are presented');
+    assert.equal(
+      _.filter(_.values(store.getState().game.defenseCardChoices.playerCards),
+        card => !card.development).length,
+      Math.min(2, applicableDefenseCardsCount), 'two choices are presented');
   });
 
   it('should properly remove cards from opponent deck', () => {
