@@ -309,7 +309,7 @@ morphingPodWalkers:
   tribe: bubble
   count: 2
 
-# note for some unimplmented cards
+# note for some unimplemented cards
 # armorShredder: precombat, destroys 5 armor from opponents, tribe: scrap
 # blackHoleFisherShip: precombat, destroys all opponents with 2 strength or less
 # add attack speed default 2, where things with speed 3 attack before anything else and things with speed 3 attack after everything else
