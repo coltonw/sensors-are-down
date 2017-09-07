@@ -12,7 +12,7 @@
   # defense: card can be used on defense (defaults to false)
   # development: card can be played instead of a defense (defaults to false)
   # space: card is used in space (defaults to false)
-  # planet: card is used on planet (defaults to false)
+  # land: card is used on planet (defaults to false)
   # tribe: card has a type that can be affected by other cards (defaults to false)
   # tank: card will move to the front of the line to block damage for other units. (defaults to false)
   # shy: card will move to the other ship when a card is played to their zone; space MUST be true (defaults to false)
@@ -52,13 +52,13 @@ planetaryBombers:
   special: precombat
   strength: 2
   defense: true
-  planet: true
+  land: true
 tankBattalion:
   name: Tank Battalion
   strength: 3
   offense: true
   defense: true
-  planet: true
+  land: true
   recharge: 2
   count: 2
 groundTroops:
@@ -67,7 +67,7 @@ groundTroops:
   damageStrength: 1
   offense: true
   defense: true
-  planet: true
+  land: true
   count: 3
 scrapHarvesters:
   name: Scrap Harvesters
@@ -85,7 +85,7 @@ nanightStorm:
   strength: 3
   offense: true
   defense: true
-  planet: true
+  land: true
   recharge: 3
   count: 3
 reanimatingSlivers:
@@ -103,7 +103,7 @@ trenchFighters:
   strength: 2
   offense: true
   defense: true
-  planet: true
+  land: true
   count: 3
 puffingPlant:
   name: Puffing Plant
@@ -112,7 +112,7 @@ puffingPlant:
   strength: 3
   offense: true
   defense: true
-  planet: true
+  land: true
   tribe: plant
 shieldBurst:
   name: Shield Burst
@@ -129,7 +129,7 @@ sporeSoldiers:
   armorStrength: 2
   offense: true
   defense: true
-  planet: true
+  land: true
   tribe: plant
   count: 2
 staccatoFlyers:
@@ -161,7 +161,7 @@ moltenSawTower:
   strength: 2
   offense: true
   defense: true
-  planet: true
+  land: true
   tribe: scrap
   recharge: 2
   count: 2
@@ -189,7 +189,7 @@ starSplinters:
   strength: 2
   offense: true
   defense: true
-  planet: true
+  land: true
   tribe: plant
   count: 2
   offensePriority: low
@@ -209,7 +209,7 @@ hoverTanks:
   armorStrength: 1
   offense: true
   defense: true
-  planet: true
+  land: true
   count: 3
   tribe: bubble
 bubbleFactory:
@@ -220,7 +220,7 @@ bubbleFactory:
   armorStrength: 3
   offense: true
   defense: true
-  planet: true
+  land: true
   tribe: bubble
 bubbleShuttles:
   generated: true
@@ -238,7 +238,7 @@ bubbleBots:
   strength: 3
   offense: true
   defense: true
-  planet: true
+  land: true
   tribe: bubble
 seedPodDropper:
   name: Seed Pod Dropper
@@ -256,7 +256,7 @@ seedPod:
   strength: 2
   offense: true
   defense: true
-  planet: true
+  land: true
   tribe: plant
 scrapReanimator:
   name: Scrap Reanimator
@@ -282,7 +282,7 @@ rovingBubbleShield:
   armorStrength: 11
   offense: true
   defense: true
-  planet: true
+  land: true
   tribe: bubble
   tank: true
 fleetingFleet:
@@ -305,7 +305,7 @@ morphingPodWalkers:
   strength: 2
   offense: true
   defense: true
-  planet: true
+  land: true
   tribe: bubble
   count: 2
 

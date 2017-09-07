@@ -129,7 +129,7 @@ describe('engine', () => {
     assert.equal(allPlayerCardsInPlay.length, 1, 'there should be only one player card in play');
     assert.deepEqual(
       [{ ...allPlayerCardsInPlay[0], cardUid: null }],
-      [_.assign({}, firstCard, { cardId: firstCardId, cardUid: null })],
+      [_.assign({}, firstCard, { cardId: firstCardId, cardUid: null, turnPlayed: 1, phasePlayed: 'offense' })],
       'the card played should be in play');
 
     const firstCardRemainingCount = store.getState().game.playerDeck[firstCardId] ?
@@ -143,7 +143,7 @@ describe('engine', () => {
     store.dispatch(engine.startGame());
     const planetDefenseCount = _.filter(
       _.values(store.getState().game.playerDeck),
-      card => card.defense && card.planet).length;
+      card => card.defense && card.land).length;
     const shipDefenseCount = _.filter(
       _.values(store.getState().game.playerDeck),
       card => card.defense && card.space).length;
