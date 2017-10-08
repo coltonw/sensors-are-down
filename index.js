@@ -12,6 +12,34 @@ const states = {
   RESUMEMODE: '_RESUMEMODE', // Prompt the user to start or restart the game.
 };
 
+// These handlers are not bound to a state
+const statelessHandlers = {
+  HowToPlayIntent() {
+    const speechObj = unstackSpeech([
+      strings.howToPlay,
+      '<break strength="x-strong" />',
+      {
+        output: strings.doYouWantToPlay,
+        reprompt: strings.welcome.reprompt,
+      },
+    ]);
+    this.emit(':ask', speechObj.output, speechObj.reprompt);
+  },
+  RunGame(messageSoFar) {
+    const store = engine.init(this.attributes.gameState);
+    const speechObj = engine.run(messageSoFar);
+
+    // update session info based on engine changes
+    this.attributes.gameState = store.getState();
+    if (store.getState().game.gameEndResults) {
+      this.handler.state = states.STARTMODE;
+      this.attributes.gamesPlayed += 1;
+    }
+
+    this.emit(':ask', speechObj.output, speechObj.reprompt);
+  },
+};
+
 const newSessionHandlers = {
   NewSession() {
     if (Object.keys(this.attributes).length === 0) {
@@ -79,12 +107,15 @@ const baseStartModeHandlers = {
   },
   Unhandled() {
     console.log('UNHANDLED');
+    console.log(this.event.request.intent);
+    console.log(JSON.stringify(this.event));
     const message = 'Say yes to continue, or no to end the game.';
     this.emit(':ask', message, message);
   },
 };
 
 const firstTimeStartGameHandlers = Alexa.CreateStateHandler(states.FIRSTSTARTMODE, {
+  ...statelessHandlers,
   ...baseStartModeHandlers,
   'AMAZON.YesIntent': function YesIntent() {
     // Would you like to hear how to play? Yes.
@@ -98,6 +129,7 @@ const firstTimeStartGameHandlers = Alexa.CreateStateHandler(states.FIRSTSTARTMOD
 });
 
 const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
+  ...statelessHandlers,
   ...baseStartModeHandlers,
   'AMAZON.YesIntent': function YesIntent() {
     // Would you like to play? Yes.
@@ -110,6 +142,7 @@ const startGameHandlers = Alexa.CreateStateHandler(states.STARTMODE, {
 });
 
 const resumeGameHandlers = Alexa.CreateStateHandler(states.RESUMEMODE, {
+  ...statelessHandlers,
   ...baseStartModeHandlers,
   'AMAZON.YesIntent': function YesIntent() {
     // Would you like to resume? Yes.
@@ -123,6 +156,7 @@ const resumeGameHandlers = Alexa.CreateStateHandler(states.RESUMEMODE, {
 });
 
 const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
+  ...statelessHandlers,
   NewSession() {
     this.handler.state = '';
     this.emitWithState('NewSession'); // Equivalent to the Start Mode NewSession handler
@@ -175,6 +209,8 @@ const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
   },
   Unhandled() {
     console.log('UNHANDLED');
+    console.log(this.event.request.intent);
+    console.log(JSON.stringify(this.event));
     const store = engine.init(this.attributes.gameState);
     const speechObj = unstackSpeech([
       speeches.unknown,
@@ -182,34 +218,6 @@ const gameModeHandlers = Alexa.CreateStateHandler(states.GAMEMODE, {
     this.emit(':ask', speechObj.output, speechObj.reprompt);
   },
 });
-
-// These handlers are not bound to a state
-const statelessHandlers = {
-  HowToPlayIntent() {
-    const speechObj = unstackSpeech([
-      strings.howToPlay,
-      '<break strength="x-strong" />',
-      {
-        output: strings.doYouWantToPlay,
-        reprompt: strings.welcome.reprompt,
-      },
-    ]);
-    this.emit(':ask', speechObj.output, speechObj.reprompt);
-  },
-  RunGame(messageSoFar) {
-    const store = engine.init(this.attributes.gameState);
-    const speechObj = engine.run(messageSoFar);
-
-    // update session info based on engine changes
-    this.attributes.gameState = store.getState();
-    if (store.getState().game.gameEndResults) {
-      this.handler.state = states.STARTMODE;
-      this.attributes.gamesPlayed += 1;
-    }
-
-    this.emit(':ask', speechObj.output, speechObj.reprompt);
-  },
-};
 
 // eslint-disable-next-line no-unused-vars
 exports.handler = function handler(event, context, callback) {
